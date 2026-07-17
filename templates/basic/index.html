@@ -1,0 +1,191 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8" />
+<meta name="viewport" content="width=device-width, initial-scale=1.0" />
+<title>__PROTOTYPE_NAME__ — __PRODUCT_NAME__</title>
+<style>
+  :root {
+    --color-bg: #f6f7f9;
+    --color-surface: #ffffff;
+    --color-border: #e2e5ea;
+    --color-text: #1b1f27;
+    --color-text-muted: #667085;
+    --color-primary: #2f5fdc;
+    --color-primary-hover: #2549ad;
+    --radius: 8px;
+    --shadow: 0 1px 2px rgba(16, 24, 40, 0.06);
+  }
+  * { box-sizing: border-box; }
+  body {
+    margin: 0;
+    font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, Helvetica, Arial, sans-serif;
+    background: var(--color-bg);
+    color: var(--color-text);
+  }
+  header.app-header {
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    padding: 16px 24px;
+    background: var(--color-surface);
+    border-bottom: 1px solid var(--color-border);
+  }
+  header.app-header .brand { font-weight: 600; font-size: 16px; }
+  header.app-header .brand .product { color: var(--color-text-muted); font-weight: 400; margin-left: 8px; }
+  main { max-width: 1080px; margin: 0 auto; padding: 24px; }
+  .tabs { display: flex; gap: 4px; border-bottom: 1px solid var(--color-border); margin-bottom: 20px; }
+  .tab-btn {
+    border: none; background: none; padding: 10px 16px; font-size: 14px; cursor: pointer;
+    color: var(--color-text-muted); border-bottom: 2px solid transparent;
+  }
+  .tab-btn:hover { color: var(--color-text); }
+  .tab-btn.active { color: var(--color-primary); border-bottom-color: var(--color-primary); font-weight: 600; }
+  .tab-btn:focus-visible { outline: 2px solid var(--color-primary); outline-offset: 2px; }
+  .panel { display: none; }
+  .panel.active { display: block; }
+  .card { background: var(--color-surface); border: 1px solid var(--color-border); border-radius: var(--radius); box-shadow: var(--shadow); padding: 20px; }
+  .toolbar { display: flex; gap: 12px; margin-bottom: 16px; flex-wrap: wrap; }
+  input[type="search"], select {
+    padding: 8px 12px; border: 1px solid var(--color-border); border-radius: var(--radius); font-size: 14px;
+  }
+  button.primary {
+    background: var(--color-primary); color: #fff; border: none; border-radius: var(--radius);
+    padding: 9px 16px; font-size: 14px; cursor: pointer;
+  }
+  button.primary:hover { background: var(--color-primary-hover); }
+  button.primary:focus-visible { outline: 2px solid var(--color-primary-hover); outline-offset: 2px; }
+  table { width: 100%; border-collapse: collapse; font-size: 14px; }
+  th, td { text-align: left; padding: 10px 12px; border-bottom: 1px solid var(--color-border); }
+  th { color: var(--color-text-muted); font-weight: 500; }
+  tr:hover td { background: #fafbfc; }
+  .badge { display: inline-block; padding: 2px 8px; border-radius: 999px; font-size: 12px; font-weight: 500; }
+  .badge.ok { background: #ecfdf3; color: #027a48; }
+  .badge.warn { background: #fffaeb; color: #b54708; }
+  .modal-overlay {
+    display: none; position: fixed; inset: 0; background: rgba(16, 24, 40, 0.45);
+    align-items: center; justify-content: center; padding: 16px;
+  }
+  .modal-overlay.open { display: flex; }
+  .modal { background: #fff; border-radius: var(--radius); padding: 24px; max-width: 420px; width: 100%; }
+  .modal h2 { margin-top: 0; font-size: 16px; }
+  .modal-actions { display: flex; justify-content: flex-end; gap: 8px; margin-top: 20px; }
+  button.secondary {
+    background: #fff; border: 1px solid var(--color-border); border-radius: var(--radius);
+    padding: 9px 16px; font-size: 14px; cursor: pointer;
+  }
+  @media (max-width: 640px) {
+    main { padding: 16px; }
+    .toolbar { flex-direction: column; }
+  }
+</style>
+</head>
+<body>
+  <header class="app-header">
+    <div class="brand">__PROTOTYPE_NAME__<span class="product">__PRODUCT_NAME__</span></div>
+    <button class="primary" id="open-modal-btn" type="button">New Item</button>
+  </header>
+
+  <main>
+    <div class="tabs" role="tablist">
+      <button class="tab-btn active" role="tab" aria-selected="true" data-tab="overview" type="button">Overview</button>
+      <button class="tab-btn" role="tab" aria-selected="false" data-tab="items" type="button">Items</button>
+    </div>
+
+    <section class="panel active" id="panel-overview">
+      <div class="card">
+        <p>This is a starter template. Replace this content with the real prototype layout.</p>
+        <p style="color: var(--color-text-muted); font-size: 13px;">All data on this page is local mock data — nothing here calls a real backend.</p>
+      </div>
+    </section>
+
+    <section class="panel" id="panel-items">
+      <div class="toolbar">
+        <input type="search" id="search-input" placeholder="Search items..." />
+        <select id="status-filter">
+          <option value="">All statuses</option>
+          <option value="ok">Healthy</option>
+          <option value="warn">Attention</option>
+        </select>
+      </div>
+      <div class="card">
+        <table>
+          <thead>
+            <tr><th>Name</th><th>Owner</th><th>Status</th></tr>
+          </thead>
+          <tbody id="items-body"></tbody>
+        </table>
+      </div>
+    </section>
+  </main>
+
+  <div class="modal-overlay" id="modal-overlay">
+    <div class="modal" role="dialog" aria-modal="true" aria-labelledby="modal-title">
+      <h2 id="modal-title">New Item</h2>
+      <p style="color: var(--color-text-muted); font-size: 13px;">This is a mock dialog — it does not submit anywhere.</p>
+      <div class="modal-actions">
+        <button class="secondary" id="modal-cancel-btn" type="button">Cancel</button>
+        <button class="primary" id="modal-confirm-btn" type="button">Confirm</button>
+      </div>
+    </div>
+  </div>
+
+  <script>
+    // Local mock data — replace with whatever the real prototype needs.
+    const MOCK_ITEMS = [
+      { name: 'Item Alpha', owner: 'Ray', status: 'ok' },
+      { name: 'Item Beta', owner: 'Jordan', status: 'warn' },
+      { name: 'Item Gamma', owner: 'Casey', status: 'ok' },
+    ];
+
+    function renderItems(items) {
+      const body = document.getElementById('items-body');
+      if (items.length === 0) {
+        body.innerHTML = '<tr><td colspan="3" style="color: var(--color-text-muted);">No items match your filters.</td></tr>';
+        return;
+      }
+      body.innerHTML = items.map((item) => `
+        <tr>
+          <td>${item.name}</td>
+          <td>${item.owner}</td>
+          <td><span class="badge ${item.status}">${item.status === 'ok' ? 'Healthy' : 'Attention'}</span></td>
+        </tr>
+      `).join('');
+    }
+
+    function applyFilters() {
+      const query = document.getElementById('search-input').value.trim().toLowerCase();
+      const status = document.getElementById('status-filter').value;
+      const filtered = MOCK_ITEMS.filter((item) => {
+        const matchesQuery = !query || item.name.toLowerCase().includes(query) || item.owner.toLowerCase().includes(query);
+        const matchesStatus = !status || item.status === status;
+        return matchesQuery && matchesStatus;
+      });
+      renderItems(filtered);
+    }
+
+    document.getElementById('search-input').addEventListener('input', applyFilters);
+    document.getElementById('status-filter').addEventListener('change', applyFilters);
+
+    // Tabs
+    document.querySelectorAll('.tab-btn').forEach((btn) => {
+      btn.addEventListener('click', () => {
+        document.querySelectorAll('.tab-btn').forEach((b) => { b.classList.remove('active'); b.setAttribute('aria-selected', 'false'); });
+        document.querySelectorAll('.panel').forEach((p) => p.classList.remove('active'));
+        btn.classList.add('active');
+        btn.setAttribute('aria-selected', 'true');
+        document.getElementById(`panel-${btn.dataset.tab}`).classList.add('active');
+      });
+    });
+
+    // Modal
+    const overlay = document.getElementById('modal-overlay');
+    document.getElementById('open-modal-btn').addEventListener('click', () => overlay.classList.add('open'));
+    document.getElementById('modal-cancel-btn').addEventListener('click', () => overlay.classList.remove('open'));
+    document.getElementById('modal-confirm-btn').addEventListener('click', () => overlay.classList.remove('open'));
+    overlay.addEventListener('click', (e) => { if (e.target === overlay) overlay.classList.remove('open'); });
+
+    renderItems(MOCK_ITEMS);
+  </script>
+</body>
+</html>

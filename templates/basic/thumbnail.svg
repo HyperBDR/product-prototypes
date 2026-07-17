@@ -1,0 +1,8 @@
+<svg xmlns="http://www.w3.org/2000/svg" width="480" height="300" viewBox="0 0 480 300">
+  <rect width="480" height="300" fill="#eef1f6"/>
+  <rect x="24" y="24" width="432" height="40" rx="6" fill="#dbe1ea"/>
+  <rect x="24" y="80" width="200" height="16" rx="4" fill="#c9d1dc"/>
+  <rect x="24" y="108" width="280" height="12" rx="4" fill="#dbe1ea"/>
+  <rect x="24" y="140" width="432" height="130" rx="8" fill="#ffffff" stroke="#dbe1ea" stroke-width="2"/>
+  <text x="240" y="215" font-family="-apple-system,Segoe UI,Roboto,sans-serif" font-size="20" fill="#8792a2" text-anchor="middle">UI Prototype</text>
+</svg>

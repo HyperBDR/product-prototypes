@@ -1,0 +1,12 @@
+{
+  "id": "example",
+  "name": "Prototype Example",
+  "description": "Sample prototype for DevMind used to verify Portal auto-discovery. Safe to delete.",
+  "status": "draft",
+  "owner": "",
+  "tags": ["example"],
+  "entry": "index.html",
+  "thumbnail": "thumbnail.svg",
+  "visible": true,
+  "order": 10
+}

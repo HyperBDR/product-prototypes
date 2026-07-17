@@ -1,0 +1,72 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8" />
+<meta name="viewport" content="width=device-width, initial-scale=1.0" />
+<title>Product Prototypes Portal</title>
+<meta name="description" content="Unified portal for AI-generated product UI prototypes." />
+<link rel="stylesheet" href="portal/styles.css" />
+</head>
+<body>
+  <header class="topbar">
+    <div class="topbar-inner">
+      <a class="brand" href="./" data-nav-home>
+        <span class="brand-mark">UP</span>
+        <span class="brand-name">Product Prototypes</span>
+      </a>
+      <div class="topbar-controls">
+        <input
+          type="search"
+          id="search-input"
+          class="search-input"
+          placeholder="Search prototypes by name, description or tag..."
+          aria-label="Search prototypes"
+        />
+        <a id="github-link" class="github-link" href="https://github.com/" target="_blank" rel="noopener noreferrer">GitHub</a>
+      </div>
+    </div>
+  </header>
+
+  <main id="main">
+    <div id="load-error" class="load-error" hidden>
+      <strong>Could not load prototype data.</strong>
+      <p id="load-error-detail"></p>
+      <p>Run <code>npm run generate</code> to (re)build <code>portal/prototypes.generated.json</code>, then reload this page.</p>
+    </div>
+
+    <section id="product-overview" class="section">
+      <div class="section-header">
+        <h1>Products</h1>
+        <p class="section-sub">Select a product to browse its prototypes, or search across everything below.</p>
+      </div>
+      <div id="product-grid" class="product-grid" role="list"></div>
+    </section>
+
+    <section id="prototype-section" class="section">
+      <div class="section-header prototype-header">
+        <div>
+          <h2 id="prototype-heading">All Prototypes</h2>
+          <p class="section-sub" id="prototype-count-label"></p>
+        </div>
+        <button id="clear-filters-btn" class="btn-ghost" type="button">Clear filters</button>
+      </div>
+
+      <div class="filter-bar" role="group" aria-label="Filter by status">
+        <button class="chip" data-status="draft" type="button" aria-pressed="true">Draft</button>
+        <button class="chip" data-status="review" type="button" aria-pressed="true">In Review</button>
+        <button class="chip" data-status="approved" type="button" aria-pressed="true">Approved</button>
+        <button class="chip chip-archived" data-status="archived" type="button" aria-pressed="false">Archived</button>
+      </div>
+
+      <div id="prototype-grid" class="prototype-grid" role="list"></div>
+      <div id="empty-state" class="empty-state" hidden></div>
+    </section>
+  </main>
+
+  <footer class="footer">
+    <p>Generated portal data last updated: <span id="generated-at">—</span></p>
+  </footer>
+
+  <script type="module" src="portal/app.js"></script>
+</body>
+</html>

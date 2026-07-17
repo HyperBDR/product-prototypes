@@ -1,0 +1,7 @@
+{
+  "id": "devmind",
+  "name": "DevMind",
+  "description": "AI-assisted developer productivity UI prototypes",
+  "order": 40,
+  "visible": true
+}

@@ -1,0 +1,7 @@
+{
+  "id": "sourcelens",
+  "name": "SourceLens",
+  "description": "Source code analysis and insight UI prototypes",
+  "order": 20,
+  "visible": true
+}

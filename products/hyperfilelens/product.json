@@ -1,0 +1,7 @@
+{
+  "id": "hyperfilelens",
+  "name": "HyperFileLens",
+  "description": "File and data inspection UI prototypes",
+  "order": 30,
+  "visible": true
+}

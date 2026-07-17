@@ -1,0 +1,7 @@
+{
+  "id": "hyperbdr",
+  "name": "HyperBDR",
+  "description": "Cloud disaster recovery and migration UI prototypes",
+  "order": 10,
+  "visible": true
+}

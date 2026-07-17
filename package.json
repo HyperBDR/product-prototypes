@@ -1,0 +1,19 @@
+{
+  "name": "product-prototypes",
+  "private": true,
+  "version": "1.0.0",
+  "description": "GitHub Pages portal for AI-generated product UI prototypes",
+  "type": "module",
+  "engines": {
+    "node": ">=18"
+  },
+  "scripts": {
+    "generate": "node scripts/generate-portal.mjs",
+    "validate": "node scripts/validate-prototypes.mjs",
+    "build": "npm run validate && npm run generate",
+    "dist": "node scripts/build-dist.mjs",
+    "serve": "node scripts/serve.mjs",
+    "create": "node scripts/create-prototype.mjs",
+    "test": "node --test"
+  }
+}

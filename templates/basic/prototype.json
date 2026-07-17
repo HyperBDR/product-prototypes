@@ -1,0 +1,12 @@
+{
+  "id": "__PROTOTYPE_ID__",
+  "name": "__PROTOTYPE_NAME__",
+  "description": "UI prototype",
+  "status": "draft",
+  "owner": "",
+  "tags": [],
+  "entry": "index.html",
+  "thumbnail": "thumbnail.svg",
+  "visible": true,
+  "order": 100
+}

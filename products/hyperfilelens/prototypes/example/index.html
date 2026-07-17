@@ -1,0 +1,182 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8" />
+<meta name="viewport" content="width=device-width, initial-scale=1.0" />
+<title>Prototype Example — HyperFileLens</title>
+<style>
+  :root {
+    --color-bg: #f6f7f9;
+    --color-surface: #ffffff;
+    --color-border: #e2e5ea;
+    --color-text: #1b1f27;
+    --color-text-muted: #667085;
+    --color-primary: #0891b2;
+    --radius: 8px;
+    --shadow: 0 1px 2px rgba(16, 24, 40, 0.06);
+  }
+  * { box-sizing: border-box; }
+  body { margin: 0; font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, Helvetica, Arial, sans-serif; background: var(--color-bg); color: var(--color-text); }
+  header.app-header {
+    display: flex; align-items: center; justify-content: space-between;
+    padding: 16px 24px; background: var(--color-surface); border-bottom: 1px solid var(--color-border);
+  }
+  header.app-header .brand { display: flex; align-items: center; gap: 10px; font-weight: 600; font-size: 16px; }
+  header.app-header .logo {
+    width: 28px; height: 28px; border-radius: 6px; background: var(--color-primary);
+    color: #fff; display: flex; align-items: center; justify-content: center; font-size: 13px; font-weight: 700;
+  }
+  header.app-header .subtitle { color: var(--color-text-muted); font-weight: 400; margin-left: 4px; }
+  nav.side {
+    position: fixed; top: 61px; bottom: 0; left: 0; width: 200px; background: var(--color-surface);
+    border-right: 1px solid var(--color-border); padding: 16px 12px;
+  }
+  nav.side a {
+    display: block; padding: 8px 12px; border-radius: var(--radius); color: var(--color-text-muted);
+    text-decoration: none; font-size: 14px; margin-bottom: 2px;
+  }
+  nav.side a.active { background: #eef1ff; color: var(--color-primary); font-weight: 600; }
+  main { max-width: 960px; margin: 0 auto; padding: 28px 24px; margin-left: 224px; }
+  @media (max-width: 720px) {
+    nav.side { display: none; }
+    main { margin-left: 0; }
+  }
+  .badge-example {
+    display: inline-block; background: #eef1ff; color: var(--color-primary);
+    font-size: 12px; font-weight: 600; padding: 3px 10px; border-radius: 999px; margin-bottom: 12px;
+  }
+  h1 { margin: 0 0 6px; font-size: 22px; }
+  p.lead { color: var(--color-text-muted); margin-top: 0; }
+  .tabs { display: flex; gap: 4px; border-bottom: 1px solid var(--color-border); margin: 20px 0; }
+  .tab-btn {
+    border: none; background: none; padding: 10px 16px; font-size: 14px; cursor: pointer;
+    color: var(--color-text-muted); border-bottom: 2px solid transparent;
+  }
+  .tab-btn:hover { color: var(--color-text); }
+  .tab-btn.active { color: var(--color-primary); border-bottom-color: var(--color-primary); font-weight: 600; }
+  .tab-btn:focus-visible { outline: 2px solid var(--color-primary); outline-offset: 2px; }
+  .panel { display: none; }
+  .panel.active { display: block; }
+  .grid { display: grid; grid-template-columns: repeat(3, 1fr); gap: 16px; margin-bottom: 20px; }
+  @media (max-width: 720px) { .grid { grid-template-columns: 1fr; } }
+  .stat-card { background: var(--color-surface); border: 1px solid var(--color-border); border-radius: var(--radius); box-shadow: var(--shadow); padding: 16px; }
+  .stat-card .label { color: var(--color-text-muted); font-size: 12px; text-transform: uppercase; letter-spacing: 0.04em; }
+  .stat-card .value { font-size: 24px; font-weight: 700; margin-top: 4px; }
+  .card { background: var(--color-surface); border: 1px solid var(--color-border); border-radius: var(--radius); box-shadow: var(--shadow); padding: 20px; }
+  table { width: 100%; border-collapse: collapse; font-size: 14px; }
+  th, td { text-align: left; padding: 10px 12px; border-bottom: 1px solid var(--color-border); }
+  th { color: var(--color-text-muted); font-weight: 500; }
+  tr:hover td { background: #fafbfc; }
+  .badge { display: inline-block; padding: 2px 8px; border-radius: 999px; font-size: 12px; font-weight: 500; }
+  .badge.ok { background: #ecfdf3; color: #027a48; }
+  .badge.warn { background: #fffaeb; color: #b54708; }
+  button.primary {
+    background: var(--color-primary); color: #fff; border: none; border-radius: var(--radius);
+    padding: 9px 16px; font-size: 14px; cursor: pointer;
+  }
+  button.primary:focus-visible { outline: 2px solid var(--color-primary); outline-offset: 2px; }
+  #toast {
+    position: fixed; bottom: 20px; right: 20px; background: #1b1f27; color: #fff; padding: 10px 16px;
+    border-radius: var(--radius); font-size: 14px; opacity: 0; transform: translateY(8px);
+    transition: opacity 0.2s ease, transform 0.2s ease; pointer-events: none;
+  }
+  #toast.show { opacity: 1; transform: translateY(0); }
+</style>
+</head>
+<body>
+  <header class="app-header">
+    <div class="brand">
+      <div class="logo">FL</div>
+      HyperFileLens<span class="subtitle">Prototype Example</span>
+    </div>
+    <button class="primary" id="refresh-btn" type="button">Refresh</button>
+  </header>
+
+  <nav class="side">
+    <a href="#" class="active">Overview</a>
+    <a href="#">Activity</a>
+    <a href="#">Settings</a>
+  </nav>
+
+  <main>
+    <span class="badge-example">EXAMPLE PROTOTYPE</span>
+    <h1>HyperFileLens</h1>
+    <p class="lead">This is a Prototype Example used to verify that the Portal can auto-discover this product's prototypes. It is safe to delete.</p>
+
+    <div class="tabs" role="tablist">
+      <button class="tab-btn active" role="tab" aria-selected="true" data-tab="overview" type="button">Overview</button>
+      <button class="tab-btn" role="tab" aria-selected="false" data-tab="records" type="button">Records</button>
+    </div>
+
+    <section class="panel active" id="panel-overview">
+      <div class="grid">
+        <div class="stat-card"><div class="label">Total Jobs</div><div class="value" id="stat-total">--</div></div>
+        <div class="stat-card"><div class="label">Healthy</div><div class="value" id="stat-ok">--</div></div>
+        <div class="stat-card"><div class="label">Needs Attention</div><div class="value" id="stat-warn">--</div></div>
+      </div>
+      <div class="card">
+        <p>All numbers on this page are local mock data defined in this file's &lt;script&gt; tag. Nothing here calls a real API.</p>
+      </div>
+    </section>
+
+    <section class="panel" id="panel-records">
+      <div class="card">
+        <table>
+          <thead><tr><th>Name</th><th>Owner</th><th>Status</th></tr></thead>
+          <tbody id="records-body"></tbody>
+        </table>
+      </div>
+    </section>
+  </main>
+
+  <div id="toast">Refreshed mock data</div>
+
+  <script>
+    const MOCK_RECORDS = [
+      { name: 'HyperFileLens Job 01', owner: 'Ray', status: 'ok' },
+      { name: 'HyperFileLens Job 02', owner: 'Jordan', status: 'warn' },
+      { name: 'HyperFileLens Job 03', owner: 'Casey', status: 'ok' },
+      { name: 'HyperFileLens Job 04', owner: 'Priya', status: 'ok' },
+    ];
+
+    function renderStats(records) {
+      document.getElementById('stat-total').textContent = records.length;
+      document.getElementById('stat-ok').textContent = records.filter((r) => r.status === 'ok').length;
+      document.getElementById('stat-warn').textContent = records.filter((r) => r.status === 'warn').length;
+    }
+
+    function renderRecords(records) {
+      document.getElementById('records-body').innerHTML = records.map((r) => `
+        <tr>
+          <td>${r.name}</td>
+          <td>${r.owner}</td>
+          <td><span class="badge ${r.status}">${r.status === 'ok' ? 'Healthy' : 'Attention'}</span></td>
+        </tr>
+      `).join('');
+    }
+
+    document.querySelectorAll('.tab-btn').forEach((btn) => {
+      btn.addEventListener('click', () => {
+        document.querySelectorAll('.tab-btn').forEach((b) => { b.classList.remove('active'); b.setAttribute('aria-selected', 'false'); });
+        document.querySelectorAll('.panel').forEach((p) => p.classList.remove('active'));
+        btn.classList.add('active');
+        btn.setAttribute('aria-selected', 'true');
+        document.getElementById(`panel-${btn.dataset.tab}`).classList.add('active');
+      });
+    });
+
+    let toastTimer = null;
+    document.getElementById('refresh-btn').addEventListener('click', () => {
+      renderStats(MOCK_RECORDS);
+      renderRecords(MOCK_RECORDS);
+      const toast = document.getElementById('toast');
+      toast.classList.add('show');
+      clearTimeout(toastTimer);
+      toastTimer = setTimeout(() => toast.classList.remove('show'), 1500);
+    });
+
+    renderStats(MOCK_RECORDS);
+    renderRecords(MOCK_RECORDS);
+  </script>
+</body>
+</html>

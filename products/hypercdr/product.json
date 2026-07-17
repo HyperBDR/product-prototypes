@@ -1,0 +1,7 @@
+{
+  "id": "hypercdr",
+  "name": "HyperCDR",
+  "description": "Cyber disaster recovery UI prototypes",
+  "order": 50,
+  "visible": true
+}
