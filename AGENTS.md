@@ -1,13 +1,17 @@
 # AGENTS.md
 
 Instructions for any AI coding tool (Claude Code, Codex, or otherwise) working in this
-repository. This is a static UI-prototype gallery, not a product codebase — read this
-before creating or editing anything.
+repository. This is a static gallery of framework-free HTML pages, not a product
+codebase — read this before creating or editing anything.
 
 ## What this repo is
 
-- A collection of independent, framework-free HTML prototypes, grouped by product,
+- A collection of independent, framework-free HTML "prototypes," grouped by product,
   published to GitHub Pages behind an auto-discovering Portal (`index.html` + `portal/`).
+  "Prototype" is used loosely here: it covers UI mockups as well as anything else that
+  can be expressed in HTML — architecture diagrams, module/structure diagrams, business
+  flowcharts, state diagrams, design write-ups. Same directory shape, same rules, same
+  publish flow, regardless of what kind of content it is.
 - Node.js exists only to scan/validate/generate/serve. It is never a runtime dependency
   of a prototype itself.
 

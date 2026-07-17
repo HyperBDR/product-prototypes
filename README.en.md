@@ -5,10 +5,11 @@
 
 [中文](README.md) ・ **English**
 
-A repository for building product UI prototypes as plain HTML pages: drop a prototype
-directory in the right place, push, and it's automatically built and published — a
-live link you can open in a browser, no frontend framework, no backend, no waiting on
-a release cycle.
+A repository for shipping anything that can be drawn as HTML: UI prototypes,
+architecture diagrams, module/structure diagrams, business flowcharts, state
+diagrams, design write-ups — if it can be expressed in HTML/SVG/CSS/JS, drop it in the
+right directory, push, and it's automatically built and published as a live link, no
+frontend framework, no backend, no waiting on a release cycle.
 
 **Live Portal: https://hyperbdr.github.io/product-prototypes/**
 
@@ -26,7 +27,10 @@ a release cycle.
 
 ### What this is
 
-- One prototype = one self-contained HTML page (with its own CSS / JS / mock data).
+- A "prototype" = one self-contained HTML page (with its own CSS / JS / mock data) —
+  **not limited to UI screens**: architecture diagrams, module/structure diagrams,
+  business flowcharts, state diagrams, design write-ups all count, as long as they're
+  built in HTML.
 - Drop it in the right directory, push to `main`, and within seconds it's live at a
   URL you can hand to product, engineering, or a customer for review.
 - No `npm install`, no Vue/React/Vite — a finished `index.html` is the whole deliverable.
@@ -57,13 +61,31 @@ standard workflow both live there.
 
 Compared to a static mockup, a dynamic prototype can be clicked, tabbed through, and
 walked end to end — reviewers don't have to imagine what happens after a click, which
-cuts review round-trips a lot.
+cuts review round-trips a lot. Tabs, step indicators, state highlighting — all of
+these "transitions" take a few lines of native JS, no extra tooling or framework
+required.
 
-It's also not limited to "one prototype = one screen": a business process, a state
-machine, a multi-step operational flow can all be built the same way (one HTML page +
-tabs / step indicators / state-switching driven by native JS). Showing a process or
-state machine interactively is usually more complete and legible than static
-screenshots or a written spec.
+### Not just UI — architecture, flowcharts and state diagrams belong here too
+
+Most things people reach for a diagramming tool for can be built in HTML just as well,
+so "prototype" here isn't limited to product screens. The same directory structure and
+the same publish flow also work well for:
+
+- **Architecture / structure diagrams**: draw nodes and edges in HTML + SVG, click a
+  node to expand detail or jump to a spec — carries a lot more information than a
+  static PNG, and it's trivial to update.
+- **Business flowcharts / sequence diagrams**: pair tabs, step indicators, and
+  progressive reveal to actually demonstrate "what happens, then what happens next,"
+  instead of describing it in a paragraph.
+- **State diagrams**: click a state node to highlight its transitions and triggers —
+  clearer than a static state-machine image.
+- **Design write-ups / tech specs**: mixed text and diagrams with collapsible
+  sections — a "clickable" living document instead of a PDF you can only scroll.
+
+The workflow is identical to a UI prototype: create a directory, write
+`prototype.json` + `index.html`, push — and you have a shareable link, with no need to
+buy a diagramming tool or schedule a review just to walk through an architecture
+diagram.
 
 ### Two rules you must not break
 
