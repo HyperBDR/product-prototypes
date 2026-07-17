@@ -38,6 +38,11 @@ should follow by default; read those two for anything not covered here.
    navigation (the page should still be legible if a CDN fails to load).
 7. **Directory name, `id` in `prototype.json`, and the URL are always identical.** If
    you rename one, rename all three together.
+8. **To keep an old version viewable, don't overwrite it — version the directory.**
+   If a redesign should keep the previous round visible/shareable (not just in git
+   history), copy it to a new directory (`dashboard-redesign-v1` → `-v2`) instead of
+   editing in place, and set the old one's `status` to `archived`. Never edit an old
+   version's files to "update" it into the new one — that defeats the point of keeping it.
 
 ## Standard workflow for "add a prototype"
 
