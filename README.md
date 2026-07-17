@@ -8,6 +8,10 @@ auto-discovering Portal.
 - Every prototype is a self-contained `index.html` you can also open directly from disk.
 - Adding a prototype never requires touching Portal code — it's discovered automatically.
 
+**If you are an AI coding tool working in this repo, read [AGENTS.md](AGENTS.md) first** —
+it has the hard directory-isolation rules and the standard prototype workflow.
+`CLAUDE.md` just points here so the two never drift apart.
+
 ## Live Portal
 
 Once GitHub Pages is enabled (see below), the Portal is available at:
