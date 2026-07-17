@@ -8,8 +8,8 @@
 // Pages does.
 //
 // Usage:
-//   npm run serve              # serves the repo root at :8080
-//   node scripts/serve.mjs --dir dist --port 5000
+//   npm run serve              # serves the repo root at :8080 on all interfaces
+//   node scripts/serve.mjs --dir dist --port 5000 --host 127.0.0.1
 
 import { createReadStream, existsSync, statSync } from 'node:fs';
 import http from 'node:http';
@@ -24,6 +24,9 @@ function argValue(flag, fallback) {
 
 const rootDir = path.resolve(process.cwd(), argValue('--dir', '.'));
 const port = Number(argValue('--port', process.env.PORT ?? '8080'));
+// Bind to all interfaces by default so the portal is reachable from other
+// machines on the LAN (e.g. http://<this-host-ip>:8080/), not just localhost.
+const host = argValue('--host', process.env.HOST ?? '0.0.0.0');
 
 const MIME_TYPES = {
   '.html': 'text/html; charset=utf-8',
@@ -81,6 +84,10 @@ const server = http.createServer((req, res) => {
   createReadStream(filePath).pipe(res);
 });
 
-server.listen(port, () => {
-  console.log(`[serve] serving ${rootDir} at http://localhost:${port}/`);
+server.listen(port, host, () => {
+  console.log(`[serve] serving ${rootDir}`);
+  console.log(`[serve]   http://localhost:${port}/`);
+  if (host === '0.0.0.0') {
+    console.log(`[serve]   also reachable via this machine's LAN IP, e.g. http://<host-ip>:${port}/`);
+  }
 });
