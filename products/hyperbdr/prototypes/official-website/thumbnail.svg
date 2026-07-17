@@ -1,0 +1,20 @@
+<svg xmlns="http://www.w3.org/2000/svg" width="480" height="300" viewBox="0 0 480 300">
+  <defs>
+    <radialGradient id="g1" cx="10%" cy="10%" r="60%">
+      <stop offset="0%" stop-color="#457ab0" stop-opacity="0.55"/>
+      <stop offset="100%" stop-color="#457ab0" stop-opacity="0"/>
+    </radialGradient>
+    <radialGradient id="g2" cx="95%" cy="95%" r="55%">
+      <stop offset="0%" stop-color="#8f0f5c" stop-opacity="0.55"/>
+      <stop offset="100%" stop-color="#8f0f5c" stop-opacity="0"/>
+    </radialGradient>
+  </defs>
+  <rect width="480" height="300" fill="#0b0b12"/>
+  <rect width="480" height="300" fill="url(#g1)"/>
+  <rect width="480" height="300" fill="url(#g2)"/>
+  <rect x="24" y="24" width="90" height="16" rx="3" fill="#ffffff" opacity="0.9"/>
+  <rect x="24" y="120" width="260" height="22" rx="4" fill="#ffffff" opacity="0.95"/>
+  <rect x="24" y="152" width="200" height="14" rx="3" fill="#ffffff" opacity="0.6"/>
+  <rect x="24" y="190" width="120" height="32" rx="16" fill="#e94f9b"/>
+  <text x="240" y="270" font-family="-apple-system,Segoe UI,Roboto,sans-serif" font-size="13" fill="#c9cfe0" text-anchor="middle" opacity="0.8">hyperbdr.com — Homepage Concept</text>
+</svg>

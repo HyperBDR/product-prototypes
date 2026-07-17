@@ -1,0 +1,12 @@
+{
+  "id": "official-website",
+  "name": "Official Website Homepage",
+  "description": "Marketing homepage concept for hyperbdr.com — hero, feature grid, use-case tabs, RPO/RTO stats, FAQ.",
+  "status": "draft",
+  "owner": "",
+  "tags": ["marketing", "website", "homepage"],
+  "entry": "index.html",
+  "thumbnail": "thumbnail.svg",
+  "visible": true,
+  "order": 20
+}

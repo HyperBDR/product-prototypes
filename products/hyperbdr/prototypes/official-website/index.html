@@ -1,0 +1,589 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8" />
+<meta name="viewport" content="width=device-width, initial-scale=1.0" />
+<title>HyperBDR — Cloud-Native Disaster Recovery &amp; Migration</title>
+<meta name="description" content="Homepage concept prototype for hyperbdr.com. Mock content only — not the live site." />
+<style>
+  :root {
+    --bg: #0b0b12;
+    --bg-elevated: #12121c;
+    --surface: #161624;
+    --border: rgba(255, 255, 255, 0.08);
+    --text: #f4f5f9;
+    --text-muted: #9aa0b4;
+    --accent-blue: #457ab0;
+    --accent-pink: #e94f9b;
+    --accent-purple: #922b62;
+    --radius: 10px;
+    --max-width: 1160px;
+  }
+  * { box-sizing: border-box; }
+  html { scroll-behavior: smooth; }
+  body {
+    margin: 0;
+    font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, Helvetica, Arial, sans-serif;
+    background: var(--bg);
+    color: var(--text);
+    line-height: 1.55;
+  }
+  a { color: inherit; }
+  .wrap { max-width: var(--max-width); margin: 0 auto; padding: 0 24px; }
+  .banner {
+    background: #1b1b2b;
+    color: var(--text-muted);
+    text-align: center;
+    font-size: 12px;
+    padding: 6px 12px;
+    border-bottom: 1px solid var(--border);
+  }
+
+  /* ---------- Nav ---------- */
+  header.nav {
+    position: sticky;
+    top: 0;
+    z-index: 50;
+    background: rgba(11, 11, 18, 0.85);
+    backdrop-filter: blur(8px);
+    border-bottom: 1px solid var(--border);
+  }
+  .nav-inner {
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    padding: 14px 24px;
+    max-width: var(--max-width);
+    margin: 0 auto;
+  }
+  .logo { display: flex; align-items: center; gap: 8px; font-weight: 700; font-size: 18px; text-decoration: none; }
+  .logo-mark {
+    width: 28px; height: 28px; border-radius: 7px;
+    background: linear-gradient(135deg, var(--accent-blue), var(--accent-pink));
+    display: flex; align-items: center; justify-content: center; font-size: 12px; font-weight: 800;
+  }
+  nav.links { display: flex; gap: 28px; }
+  nav.links a { font-size: 14px; color: var(--text-muted); text-decoration: none; }
+  nav.links a:hover, nav.links a:focus-visible { color: var(--text); }
+  .nav-actions { display: flex; align-items: center; gap: 12px; }
+  .btn {
+    display: inline-flex; align-items: center; justify-content: center;
+    font-size: 14px; font-weight: 600; padding: 10px 18px; border-radius: 999px;
+    text-decoration: none; cursor: pointer; border: 1px solid transparent;
+  }
+  .btn-primary { background: linear-gradient(135deg, var(--accent-pink), var(--accent-purple)); color: #fff; }
+  .btn-primary:hover { filter: brightness(1.08); }
+  .btn-ghost { background: transparent; border-color: var(--border); color: var(--text); }
+  .btn-ghost:hover { background: var(--surface); }
+  .btn:focus-visible { outline: 2px solid var(--accent-pink); outline-offset: 2px; }
+  .nav-toggle { display: none; background: none; border: 1px solid var(--border); border-radius: 8px; padding: 8px 10px; color: var(--text); }
+
+  /* ---------- Hero ---------- */
+  .hero {
+    position: relative;
+    overflow: hidden;
+    padding: 88px 0 72px;
+    background:
+      radial-gradient(circle at 10% 10%, rgba(69, 122, 176, 0.28) 0%, transparent 42%),
+      radial-gradient(circle at 92% 92%, rgba(143, 15, 92, 0.28) 0%, transparent 38%);
+  }
+  .hero-grid { display: grid; grid-template-columns: 1.1fr 0.9fr; gap: 48px; align-items: center; }
+  .eyebrow {
+    display: inline-flex; align-items: center; gap: 8px; font-size: 12px; font-weight: 600;
+    color: var(--accent-pink); text-transform: uppercase; letter-spacing: 0.06em;
+    background: rgba(233, 79, 155, 0.12); border: 1px solid rgba(233, 79, 155, 0.3);
+    padding: 6px 12px; border-radius: 999px; margin-bottom: 20px;
+  }
+  h1.hero-title { font-size: 44px; line-height: 1.15; margin: 0 0 18px; letter-spacing: -0.01em; }
+  h1.hero-title .accent { background: linear-gradient(135deg, var(--accent-pink), var(--accent-blue)); -webkit-background-clip: text; background-clip: text; color: transparent; }
+  .hero-sub { font-size: 17px; color: var(--text-muted); margin: 0 0 32px; max-width: 520px; }
+  .hero-cta { display: flex; gap: 14px; flex-wrap: wrap; margin-bottom: 28px; }
+  .hero-meta { font-size: 13px; color: var(--text-muted); }
+
+  .hero-visual {
+    background: var(--surface);
+    border: 1px solid var(--border);
+    border-radius: 16px;
+    padding: 20px;
+    box-shadow: 0 20px 60px rgba(0, 0, 0, 0.4);
+  }
+  .hero-visual .visual-topbar { display: flex; gap: 6px; margin-bottom: 16px; }
+  .hero-visual .dot { width: 9px; height: 9px; border-radius: 50%; background: var(--border); }
+  .visual-row { display: flex; justify-content: space-between; align-items: center; padding: 10px 0; border-bottom: 1px solid var(--border); font-size: 13px; }
+  .visual-row:last-child { border-bottom: none; }
+  .visual-row .name { color: var(--text); }
+  .visual-row .rpo { color: var(--text-muted); font-variant-numeric: tabular-nums; }
+  .pill { font-size: 11px; font-weight: 600; padding: 3px 9px; border-radius: 999px; }
+  .pill-ok { background: rgba(52, 199, 123, 0.15); color: #34c77b; }
+  .pill-sync { background: rgba(69, 122, 176, 0.18); color: #7fb2e8; }
+
+  /* ---------- Trust bar ---------- */
+  .trust { padding: 28px 0; border-top: 1px solid var(--border); border-bottom: 1px solid var(--border); }
+  .trust-label { text-align: center; font-size: 12px; color: var(--text-muted); text-transform: uppercase; letter-spacing: 0.08em; margin-bottom: 18px; }
+  .trust-row { display: flex; justify-content: center; gap: 40px; flex-wrap: wrap; opacity: 0.7; }
+  .trust-row span { font-weight: 700; font-size: 15px; color: var(--text-muted); letter-spacing: 0.02em; }
+
+  /* ---------- Sections ---------- */
+  section { padding: 88px 0; }
+  .section-head { text-align: center; max-width: 620px; margin: 0 auto 48px; }
+  .section-head h2 { font-size: 30px; margin: 0 0 12px; }
+  .section-head p { color: var(--text-muted); margin: 0; font-size: 15px; }
+
+  /* Features */
+  .feature-grid { display: grid; grid-template-columns: repeat(3, 1fr); gap: 20px; }
+  .feature-card {
+    background: var(--surface); border: 1px solid var(--border); border-radius: var(--radius);
+    padding: 24px; transition: border-color 0.15s ease, transform 0.15s ease;
+  }
+  .feature-card:hover { border-color: rgba(233, 79, 155, 0.4); transform: translateY(-2px); }
+  .feature-icon {
+    width: 40px; height: 40px; border-radius: 10px; display: flex; align-items: center; justify-content: center;
+    background: linear-gradient(135deg, rgba(69, 122, 176, 0.25), rgba(233, 79, 155, 0.25)); margin-bottom: 16px;
+  }
+  .feature-card h3 { font-size: 16px; margin: 0 0 8px; }
+  .feature-card p { font-size: 14px; color: var(--text-muted); margin: 0; }
+
+  /* Use cases (tabs) */
+  .usecase-tabs { display: flex; gap: 8px; justify-content: center; flex-wrap: wrap; margin-bottom: 32px; }
+  .usecase-tab {
+    background: var(--surface); border: 1px solid var(--border); color: var(--text-muted);
+    padding: 10px 18px; border-radius: 999px; font-size: 13px; cursor: pointer;
+  }
+  .usecase-tab[aria-selected="true"] { background: var(--accent-pink); border-color: var(--accent-pink); color: #fff; font-weight: 600; }
+  .usecase-panel { display: none; background: var(--surface); border: 1px solid var(--border); border-radius: 16px; padding: 36px; }
+  .usecase-panel.active { display: grid; grid-template-columns: 1fr 1fr; gap: 32px; align-items: center; }
+  .usecase-panel h3 { margin: 0 0 10px; font-size: 20px; }
+  .usecase-panel p { color: var(--text-muted); font-size: 14px; margin: 0 0 16px; }
+  .usecase-panel ul { margin: 0; padding-left: 18px; color: var(--text-muted); font-size: 14px; }
+  .usecase-panel ul li { margin-bottom: 6px; }
+  .usecase-diagram {
+    background: var(--bg-elevated); border: 1px dashed var(--border); border-radius: 12px;
+    padding: 24px; display: flex; align-items: center; justify-content: center; gap: 16px; font-size: 13px; color: var(--text-muted); min-height: 140px;
+  }
+  .usecase-diagram .node { background: var(--surface); border: 1px solid var(--border); border-radius: 8px; padding: 10px 14px; text-align: center; }
+  .usecase-diagram .arrow { color: var(--accent-pink); font-size: 18px; }
+
+  /* Stats */
+  .stats-band {
+    background: linear-gradient(135deg, rgba(69, 122, 176, 0.15), rgba(143, 15, 92, 0.15));
+    border-top: 1px solid var(--border); border-bottom: 1px solid var(--border);
+  }
+  .stats-grid { display: grid; grid-template-columns: repeat(4, 1fr); gap: 24px; text-align: center; }
+  .stat-num { font-size: 36px; font-weight: 800; }
+  .stat-label { font-size: 13px; color: var(--text-muted); margin-top: 6px; }
+
+  /* How it works */
+  .steps { display: grid; grid-template-columns: repeat(4, 1fr); gap: 20px; }
+  .step { position: relative; padding: 24px; background: var(--surface); border: 1px solid var(--border); border-radius: var(--radius); }
+  .step-num { font-size: 13px; font-weight: 700; color: var(--accent-pink); margin-bottom: 10px; }
+  .step h3 { font-size: 15px; margin: 0 0 8px; }
+  .step p { font-size: 13px; color: var(--text-muted); margin: 0; }
+
+  /* Testimonial */
+  .testimonial { max-width: 720px; margin: 0 auto; text-align: center; }
+  .testimonial blockquote { font-size: 20px; font-weight: 500; margin: 0 0 20px; line-height: 1.5; }
+  .testimonial cite { display: block; font-style: normal; color: var(--text-muted); font-size: 13px; }
+
+  /* CTA band */
+  .cta-band {
+    background: var(--surface); border: 1px solid var(--border); border-radius: 20px;
+    padding: 56px; text-align: center; margin: 0 24px;
+  }
+  .cta-band h2 { font-size: 26px; margin: 0 0 12px; }
+  .cta-band p { color: var(--text-muted); margin: 0 0 28px; }
+
+  /* FAQ */
+  .faq-list { max-width: 720px; margin: 0 auto; }
+  .faq-item { border-bottom: 1px solid var(--border); }
+  .faq-question {
+    width: 100%; text-align: left; background: none; border: none; color: var(--text);
+    font-size: 15px; font-weight: 600; padding: 18px 4px; cursor: pointer;
+    display: flex; justify-content: space-between; align-items: center; gap: 12px;
+  }
+  .faq-question .icon { transition: transform 0.15s ease; color: var(--text-muted); }
+  .faq-item.open .faq-question .icon { transform: rotate(45deg); }
+  .faq-answer { max-height: 0; overflow: hidden; transition: max-height 0.2s ease; color: var(--text-muted); font-size: 14px; }
+  .faq-item.open .faq-answer { max-height: 200px; padding-bottom: 18px; }
+
+  /* Footer */
+  footer.site-footer { border-top: 1px solid var(--border); padding: 48px 0 28px; color: var(--text-muted); font-size: 13px; }
+  .footer-grid { display: grid; grid-template-columns: 2fr repeat(3, 1fr); gap: 32px; margin-bottom: 32px; }
+  .footer-grid h4 { color: var(--text); font-size: 13px; margin: 0 0 12px; }
+  .footer-grid ul { list-style: none; margin: 0; padding: 0; }
+  .footer-grid li { margin-bottom: 8px; }
+  .footer-grid a { text-decoration: none; color: var(--text-muted); }
+  .footer-grid a:hover { color: var(--text); }
+  .footer-bottom { display: flex; justify-content: space-between; flex-wrap: wrap; gap: 8px; border-top: 1px solid var(--border); padding-top: 20px; }
+
+  @media (max-width: 900px) {
+    .hero-grid { grid-template-columns: 1fr; }
+    .feature-grid { grid-template-columns: repeat(2, 1fr); }
+    .stats-grid { grid-template-columns: repeat(2, 1fr); }
+    .steps { grid-template-columns: repeat(2, 1fr); }
+    .footer-grid { grid-template-columns: repeat(2, 1fr); }
+    .usecase-panel.active { grid-template-columns: 1fr; }
+  }
+  @media (max-width: 640px) {
+    nav.links, .nav-actions .btn-ghost { display: none; }
+    .nav-toggle { display: inline-flex; }
+    h1.hero-title { font-size: 32px; }
+    .feature-grid, .steps { grid-template-columns: 1fr; }
+    .stats-grid { grid-template-columns: repeat(2, 1fr); }
+    .cta-band { padding: 36px 20px; margin: 0 16px; }
+  }
+</style>
+</head>
+<body>
+  <div class="banner">Homepage concept prototype — mock content, not the live hyperbdr.com site</div>
+
+  <header class="nav">
+    <div class="nav-inner">
+      <a class="logo" href="#top">
+        <span class="logo-mark">H</span>
+        HyperBDR
+      </a>
+      <nav class="links" aria-label="Primary">
+        <a href="#features">Product</a>
+        <a href="#use-cases">Use Cases</a>
+        <a href="#how-it-works">How It Works</a>
+        <a href="#faq">FAQ</a>
+      </nav>
+      <div class="nav-actions">
+        <a class="btn btn-ghost" href="#faq">Contact Sales</a>
+        <a class="btn btn-primary" href="#cta">Request Demo</a>
+        <button class="nav-toggle" id="nav-toggle" type="button" aria-expanded="false" aria-label="Toggle menu">☰</button>
+      </div>
+    </div>
+    <nav class="links" id="mobile-nav" aria-label="Mobile" style="display:none; flex-direction:column; gap:0; padding: 0 24px 16px;">
+      <a href="#features" style="padding:10px 0;">Product</a>
+      <a href="#use-cases" style="padding:10px 0;">Use Cases</a>
+      <a href="#how-it-works" style="padding:10px 0;">How It Works</a>
+      <a href="#faq" style="padding:10px 0;">FAQ</a>
+      <a class="btn btn-primary" href="#cta" style="margin-top:8px;">Request Demo</a>
+    </nav>
+  </header>
+
+  <main id="top">
+    <section class="hero">
+      <div class="wrap hero-grid">
+        <div>
+          <div class="eyebrow">Cloud-native DR &amp; migration · since 2017</div>
+          <h1 class="hero-title">One-click recovery,<br /><span class="accent">anywhere your workloads live.</span></h1>
+          <p class="hero-sub">HyperBDR delivers minute-level RPO and RTO across physical, virtual, and cloud environments, with Boot in Cloud recovery and cross-cloud disaster recovery in a single platform.</p>
+          <div class="hero-cta">
+            <a class="btn btn-primary" href="#cta">Request a Demo</a>
+            <a class="btn btn-ghost" href="#features">Explore the Platform</a>
+          </div>
+          <div class="hero-meta">No credit card required · Works with your existing infrastructure</div>
+        </div>
+        <div class="hero-visual" aria-hidden="true">
+          <div class="visual-topbar">
+            <span class="dot"></span><span class="dot"></span><span class="dot"></span>
+          </div>
+          <div class="visual-row"><span class="name">prod-db-01 (x86 host)</span><span class="pill pill-ok">Protected</span></div>
+          <div class="visual-row"><span class="name">vm-cluster-east</span><span class="pill pill-sync">Syncing · RPO 58s</span></div>
+          <div class="visual-row"><span class="name">app-tier-cloud</span><span class="pill pill-ok">Protected</span></div>
+          <div class="visual-row"><span class="name">legacy-erp-02</span><span class="pill pill-sync">Syncing · RPO 41s</span></div>
+          <div class="visual-row"><span class="name">edge-node-cn</span><span class="pill pill-ok">Protected</span></div>
+        </div>
+      </div>
+    </section>
+
+    <div class="trust wrap">
+      <div class="trust-label">Built for enterprise infrastructure teams</div>
+      <div class="trust-row">
+        <span>ACME Financial</span><span>Northwind Logistics</span><span>Globex Cloud</span><span>Initech Systems</span><span>Umbrella Health</span>
+      </div>
+    </div>
+
+    <section id="features">
+      <div class="wrap">
+        <div class="section-head">
+          <h2>Everything DR and migration needs, one platform</h2>
+          <p>Protect and move workloads across physical, virtual, and cloud environments without re-architecting anything.</p>
+        </div>
+        <div class="feature-grid">
+          <div class="feature-card">
+            <div class="feature-icon"><svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="#f2a8d0" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"><polygon points="13 2 3 14 11 14 10 22 21 10 13 10 13 2"/></svg></div>
+            <h3>One-Click Recovery</h3>
+            <p>Trigger full-environment failover and failback with a single action, orchestrated end to end.</p>
+          </div>
+          <div class="feature-card">
+            <div class="feature-icon"><svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="#f2a8d0" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"><path d="M17.5 19a4.5 4.5 0 0 0 0-9 6 6 0 0 0-11.4-1.5A4.5 4.5 0 0 0 6.5 19h11z"/><path d="M12 12v6"/><path d="M9.5 15.5 12 13l2.5 2.5"/></svg></div>
+            <h3>Boot in Cloud</h3>
+            <p>Bring protected workloads online directly in the cloud in minutes, without pre-provisioned standby infrastructure.</p>
+          </div>
+          <div class="feature-card">
+            <div class="feature-icon"><svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="#f2a8d0" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"><path d="M3 12a9 9 0 0 1 15-6.7L21 8"/><path d="M21 3v5h-5"/><path d="M21 12a9 9 0 0 1-15 6.7L3 16"/><path d="M3 21v-5h5"/></svg></div>
+            <h3>Cross-Cloud DR</h3>
+            <p>Replicate between any combination of public, private, and on-prem clouds — no vendor lock-in.</p>
+          </div>
+          <div class="feature-card">
+            <div class="feature-icon"><svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="#f2a8d0" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"><rect x="3" y="4" width="18" height="12" rx="2"/><path d="M8 20h8"/><path d="M12 16v4"/></svg></div>
+            <h3>x86 Host Backup</h3>
+            <p>Native, agent-based protection for physical x86 servers alongside your virtualized estate.</p>
+          </div>
+          <div class="feature-card">
+            <div class="feature-icon"><svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="#f2a8d0" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"><rect x="3" y="7" width="18" height="14" rx="2"/><path d="M3 7l3-4h12l3 4"/><circle cx="12" cy="14" r="3"/></svg></div>
+            <h3>Cloud Snapshot</h3>
+            <p>Application-consistent, incremental snapshots with configurable retention and instant restore points.</p>
+          </div>
+          <div class="feature-card">
+            <div class="feature-icon"><svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="#f2a8d0" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"><path d="M4 7h4l3 3"/><path d="M15 14l3 3h4"/><path d="M4 17h4l8-10h4"/><path d="M18 4l3 3-3 3"/><path d="M18 14l3 3-3 3"/></svg></div>
+            <h3>Cross-Platform Recovery</h3>
+            <p>Recover a VMware VM into a public cloud, or a cloud instance back on-prem — the platform handles the conversion.</p>
+          </div>
+        </div>
+      </div>
+    </section>
+
+    <section id="use-cases">
+      <div class="wrap">
+        <div class="section-head">
+          <h2>Use cases</h2>
+          <p>The same platform, whichever direction your workloads need to move.</p>
+        </div>
+        <div class="usecase-tabs" role="tablist">
+          <button class="usecase-tab" role="tab" aria-selected="true" data-usecase="p2c" type="button">Physical → Cloud</button>
+          <button class="usecase-tab" role="tab" aria-selected="false" data-usecase="v2c" type="button">Virtual → Cloud</button>
+          <button class="usecase-tab" role="tab" aria-selected="false" data-usecase="c2c" type="button">Cloud → Cloud</button>
+          <button class="usecase-tab" role="tab" aria-selected="false" data-usecase="dr" type="button">On-Prem DR</button>
+        </div>
+
+        <div class="usecase-panel active" id="usecase-p2c">
+          <div>
+            <h3>Physical → Cloud</h3>
+            <p>Continuously replicate physical x86 servers into cloud-native snapshots, then boot a recovery instance on demand.</p>
+            <ul>
+              <li>Agent-based, application-consistent replication</li>
+              <li>No downtime on the source host during sync</li>
+              <li>Minute-level RPO for critical workloads</li>
+            </ul>
+          </div>
+          <div class="usecase-diagram">
+            <div class="node">Physical host</div><span class="arrow">→</span><div class="node">Cloud snapshot</div><span class="arrow">→</span><div class="node">Boot in Cloud</div>
+          </div>
+        </div>
+        <div class="usecase-panel" id="usecase-v2c">
+          <div>
+            <h3>Virtual → Cloud</h3>
+            <p>Migrate or protect VMware/Hyper-V virtual machines by replicating directly into your cloud of choice.</p>
+            <ul>
+              <li>No format conversion required by the operator</li>
+              <li>Test failover without impacting production</li>
+              <li>Scales across large VM clusters</li>
+            </ul>
+          </div>
+          <div class="usecase-diagram">
+            <div class="node">VM cluster</div><span class="arrow">→</span><div class="node">Replication engine</div><span class="arrow">→</span><div class="node">Cloud instance</div>
+          </div>
+        </div>
+        <div class="usecase-panel" id="usecase-c2c">
+          <div>
+            <h3>Cloud → Cloud</h3>
+            <p>Avoid single-cloud lock-in by replicating workloads across two or more cloud providers simultaneously.</p>
+            <ul>
+              <li>Cross-cloud failover in a single console</li>
+              <li>Region- and provider-level redundancy</li>
+              <li>Consistent RTO regardless of target cloud</li>
+            </ul>
+          </div>
+          <div class="usecase-diagram">
+            <div class="node">Cloud A</div><span class="arrow">⇄</span><div class="node">HyperBDR</div><span class="arrow">⇄</span><div class="node">Cloud B</div>
+          </div>
+        </div>
+        <div class="usecase-panel" id="usecase-dr">
+          <div>
+            <h3>On-Prem DR</h3>
+            <p>Keep a warm standby of your data center workloads in the cloud, ready to boot the moment it's needed.</p>
+            <ul>
+              <li>Scheduled DR drills without production impact</li>
+              <li>Automated failback once primary site recovers</li>
+              <li>Full runbook orchestration built in</li>
+            </ul>
+          </div>
+          <div class="usecase-diagram">
+            <div class="node">Data center</div><span class="arrow">→</span><div class="node">Warm standby</div><span class="arrow">→</span><div class="node">Boot on failover</div>
+          </div>
+        </div>
+      </div>
+    </section>
+
+    <section class="stats-band">
+      <div class="wrap">
+        <div class="stats-grid" id="stats-grid">
+          <div><div class="stat-num" data-target="60">0</div><div class="stat-label">Second-level RPO</div></div>
+          <div><div class="stat-num" data-target="5">0</div><div class="stat-label">Minute-level RTO</div></div>
+          <div><div class="stat-num" data-target="2017">0</div><div class="stat-label">Built since</div></div>
+          <div><div class="stat-num" data-target="99">0</div><div class="stat-label">% recovery success rate</div></div>
+        </div>
+      </div>
+    </section>
+
+    <section id="how-it-works">
+      <div class="wrap">
+        <div class="section-head">
+          <h2>How it works</h2>
+          <p>From first sync to a tested recovery plan in four steps.</p>
+        </div>
+        <div class="steps">
+          <div class="step"><div class="step-num">01</div><h3>Connect a source</h3><p>Add a physical host, VM cluster, or cloud account through the HyperBDR console.</p></div>
+          <div class="step"><div class="step-num">02</div><h3>Configure protection</h3><p>Set RPO targets and retention policy; replication starts automatically.</p></div>
+          <div class="step"><div class="step-num">03</div><h3>Test failover</h3><p>Run an isolated recovery drill in the cloud without touching production.</p></div>
+          <div class="step"><div class="step-num">04</div><h3>Recover or migrate</h3><p>Trigger one-click recovery, or promote the target as a permanent migration.</p></div>
+        </div>
+      </div>
+    </section>
+
+    <section>
+      <div class="wrap testimonial">
+        <blockquote>"We cut our disaster recovery test time from a full day to under twenty minutes, and finally trust the RTO number we give leadership."</blockquote>
+        <cite>— IT Director, illustrative customer quote (mock content)</cite>
+      </div>
+    </section>
+
+    <section id="cta">
+      <div class="cta-band">
+        <h2>See HyperBDR on your own infrastructure</h2>
+        <p>Bring a sample workload and we'll walk through a live recovery drill.</p>
+        <a class="btn btn-primary" href="#top">Request a Demo</a>
+      </div>
+    </section>
+
+    <section id="faq">
+      <div class="wrap">
+        <div class="section-head">
+          <h2>Frequently asked questions</h2>
+        </div>
+        <div class="faq-list" id="faq-list">
+          <div class="faq-item">
+            <button class="faq-question" type="button">
+              <span>Does HyperBDR require agents on every host?</span><span class="icon">+</span>
+            </button>
+            <div class="faq-answer"><p>Physical x86 hosts use a lightweight agent; most virtual and cloud sources are protected agentlessly via the hypervisor or cloud API.</p></div>
+          </div>
+          <div class="faq-item">
+            <button class="faq-question" type="button">
+              <span>Can I fail back to my original environment?</span><span class="icon">+</span>
+            </button>
+            <div class="faq-answer"><p>Yes — failback is a built-in workflow that reverse-replicates changes made during failover back to the original source.</p></div>
+          </div>
+          <div class="faq-item">
+            <button class="faq-question" type="button">
+              <span>Which clouds are supported as recovery targets?</span><span class="icon">+</span>
+            </button>
+            <div class="faq-answer"><p>HyperBDR is cloud-agnostic and supports major public clouds as well as private/OpenStack-based clouds as recovery targets.</p></div>
+          </div>
+          <div class="faq-item">
+            <button class="faq-question" type="button">
+              <span>How is this different from traditional backup?</span><span class="icon">+</span>
+            </button>
+            <div class="faq-answer"><p>Backup restores data; HyperBDR boots a running, network-reachable workload in minutes — designed for recovery time, not just data retention.</p></div>
+          </div>
+        </div>
+      </div>
+    </section>
+  </main>
+
+  <footer class="site-footer">
+    <div class="wrap">
+      <div class="footer-grid">
+        <div>
+          <a class="logo" href="#top" style="margin-bottom: 12px;">
+            <span class="logo-mark">H</span>HyperBDR
+          </a>
+          <p style="max-width: 280px;">Cloud-native disaster recovery and migration, built since 2017.</p>
+        </div>
+        <div>
+          <h4>Product</h4>
+          <ul>
+            <li><a href="#features">Features</a></li>
+            <li><a href="#use-cases">Use Cases</a></li>
+            <li><a href="#how-it-works">How It Works</a></li>
+          </ul>
+        </div>
+        <div>
+          <h4>Company</h4>
+          <ul>
+            <li><a href="#top">About</a></li>
+            <li><a href="#cta">Contact Sales</a></li>
+            <li><a href="#faq">FAQ</a></li>
+          </ul>
+        </div>
+        <div>
+          <h4>More prototypes</h4>
+          <ul>
+            <li><a href="../example/">HyperBDR example prototype</a></li>
+            <li><a href="../../../../">Back to Portal</a></li>
+          </ul>
+        </div>
+      </div>
+      <div class="footer-bottom">
+        <span>© 2026 HyperBDR. Prototype content — not the live site.</span>
+        <span>Homepage concept · v1</span>
+      </div>
+    </div>
+  </footer>
+
+  <script>
+    // Mobile nav toggle
+    const navToggle = document.getElementById('nav-toggle');
+    const mobileNav = document.getElementById('mobile-nav');
+    navToggle.addEventListener('click', () => {
+      const isOpen = mobileNav.style.display === 'flex';
+      mobileNav.style.display = isOpen ? 'none' : 'flex';
+      navToggle.setAttribute('aria-expanded', String(!isOpen));
+    });
+    mobileNav.querySelectorAll('a').forEach((a) => a.addEventListener('click', () => {
+      mobileNav.style.display = 'none';
+      navToggle.setAttribute('aria-expanded', 'false');
+    }));
+
+    // Use-case tabs
+    document.querySelectorAll('.usecase-tab').forEach((tab) => {
+      tab.addEventListener('click', () => {
+        document.querySelectorAll('.usecase-tab').forEach((t) => t.setAttribute('aria-selected', 'false'));
+        document.querySelectorAll('.usecase-panel').forEach((p) => p.classList.remove('active'));
+        tab.setAttribute('aria-selected', 'true');
+        document.getElementById(`usecase-${tab.dataset.usecase}`).classList.add('active');
+      });
+    });
+
+    // FAQ accordion
+    document.querySelectorAll('.faq-item').forEach((item) => {
+      item.querySelector('.faq-question').addEventListener('click', () => {
+        const wasOpen = item.classList.contains('open');
+        document.querySelectorAll('.faq-item').forEach((i) => i.classList.remove('open'));
+        if (!wasOpen) item.classList.add('open');
+      });
+    });
+
+    // Animate stat counters when scrolled into view
+    function animateCount(el) {
+      const target = Number(el.dataset.target);
+      const duration = 900;
+      const start = performance.now();
+      function tick(now) {
+        const progress = Math.min((now - start) / duration, 1);
+        el.textContent = Math.round(target * progress);
+        if (progress < 1) requestAnimationFrame(tick);
+      }
+      requestAnimationFrame(tick);
+    }
+    const statEls = document.querySelectorAll('.stat-num');
+    if ('IntersectionObserver' in window) {
+      const observer = new IntersectionObserver((entries) => {
+        entries.forEach((entry) => {
+          if (entry.isIntersecting) {
+            animateCount(entry.target);
+            observer.unobserve(entry.target);
+          }
+        });
+      }, { threshold: 0.4 });
+      statEls.forEach((el) => observer.observe(el));
+    } else {
+      statEls.forEach((el) => { el.textContent = el.dataset.target; });
+    }
+  </script>
+</body>
+</html>
