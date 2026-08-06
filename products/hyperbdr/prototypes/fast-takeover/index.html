@@ -1,0 +1,620 @@
+<!doctype html>
+<html lang="en">
+  <head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title>HyperBDR - 主机容灾</title>
+    <link rel="stylesheet" href="styles.css" />
+  </head>
+  <body>
+    <svg class="svg-sprite" aria-hidden="true">
+      <symbol id="icon-menu" viewBox="0 0 24 24"><path d="M4 6h16M4 12h16M4 18h16" /></symbol>
+      <symbol id="icon-building" viewBox="0 0 24 24"><path d="M4 21h16M6 21V5h8v16M14 9h4v12M9 8h2M9 12h2M9 16h2M17 12h1M17 16h1" /></symbol>
+      <symbol id="icon-cloud-server" viewBox="0 0 24 24"><path d="M6 18a4 4 0 0 1-.8-7.9A7 7 0 0 1 18.7 9 4.5 4.5 0 0 1 18 18H6Z" /><path d="M9 15h6M10 12h4" /></symbol>
+      <symbol id="icon-cube" viewBox="0 0 24 24"><path d="m12 3 8 4.5v9L12 21l-8-4.5v-9L12 3Z" /><path d="m4.4 7.7 7.6 4.4 7.6-4.4M12 12v9" /></symbol>
+      <symbol id="icon-takeover" viewBox="0 0 24 24"><path d="M5 3h10l4 4v14H5V3Z" /><path d="M15 3v5h5M8 12h8M8 16h5" /><path d="m15 18 2 2 4-4" /></symbol>
+      <symbol id="icon-quick-takeover" viewBox="0 0 24 24"><path d="m13 2-8 12h7l-1 8 8-12h-7l1-8Z" /></symbol>
+      <symbol id="icon-cloud-up" viewBox="0 0 24 24"><path d="M7 18a4 4 0 0 1-.8-7.9A6 6 0 0 1 17.7 9 4.5 4.5 0 0 1 17 18" /><path d="M12 18V11m-3 3 3-3 3 3" /></symbol>
+      <symbol id="icon-chevron-down" viewBox="0 0 24 24"><path d="m7 9 5 5 5-5" /></symbol>
+      <symbol id="icon-chevrons-right" viewBox="0 0 24 24"><path d="m5 5 7 7-7 7M12 5l7 7-7 7" /></symbol>
+      <symbol id="icon-refresh" viewBox="0 0 24 24"><path d="M20 6v5h-5M4 18v-5h5" /><path d="M6.1 9A7 7 0 0 1 18.8 7M17.9 15A7 7 0 0 1 5.2 17" /></symbol>
+      <symbol id="icon-tag" viewBox="0 0 24 24"><path d="M20 13 13 20 4 11V4h7l9 9Z" /><circle cx="8.5" cy="8.5" r="1.2" /></symbol>
+      <symbol id="icon-filter" viewBox="0 0 24 24"><path d="M4 5h16l-6.5 7.5V20l-3-1.5v-6L4 5Z" /></symbol>
+      <symbol id="icon-settings" viewBox="0 0 24 24"><circle cx="12" cy="12" r="3" /><path d="M19.4 15a1.7 1.7 0 0 0 .3 1.9l.1.1-2.8 2.8-.1-.1a1.7 1.7 0 0 0-1.9-.3 1.7 1.7 0 0 0-1 1.6v.2h-4V21a1.7 1.7 0 0 0-1-1.6 1.7 1.7 0 0 0-1.9.3l-.1.1L4.2 17l.1-.1a1.7 1.7 0 0 0 .3-1.9A1.7 1.7 0 0 0 3 14H2.8v-4H3a1.7 1.7 0 0 0 1.6-1 1.7 1.7 0 0 0-.3-1.9L4.2 7 7 4.2l.1.1a1.7 1.7 0 0 0 1.9.3A1.7 1.7 0 0 0 10 3V2.8h4V3a1.7 1.7 0 0 0 1 1.6 1.7 1.7 0 0 0 1.9-.3l.1-.1L19.8 7l-.1.1a1.7 1.7 0 0 0-.3 1.9 1.7 1.7 0 0 0 1.6 1h.2v4H21a1.7 1.7 0 0 0-1.6 1Z" /></symbol>
+      <symbol id="icon-sort" viewBox="0 0 12 12"><path class="fill-icon" d="m6 1 3 3H3l3-3Zm0 10-3-3h6l-3 3Z" /></symbol>
+      <symbol id="icon-linux" viewBox="0 0 24 24"><rect x="4" y="5" width="16" height="14" rx="2" /><path d="m8 10 2 2-2 2M12 15h4" /></symbol>
+      <symbol id="icon-windows" viewBox="0 0 24 24"><path class="fill-icon" d="M3 4.8 11 3.7v7.7H3V4.8Zm9-1.2L21 2.3v9.1h-9V3.6ZM3 12.5h8v7.7l-8-1.1v-6.6Zm9 0h9v9.2l-9-1.3v-7.9Z" /></symbol>
+      <symbol id="icon-vm" viewBox="0 0 24 24"><rect x="3" y="7" width="11" height="11" rx="1" /><rect x="9" y="3" width="12" height="12" rx="1" /></symbol>
+      <symbol id="icon-openstack" viewBox="0 0 24 24"><path class="fill-icon" d="M4 4h16v6h-4V8H8v2H4V4Zm0 10h4v2h8v-2h4v6H4v-6Zm4-4h8v4H8v-4Z" /></symbol>
+      <symbol id="icon-clock" viewBox="0 0 24 24"><circle cx="12" cy="12" r="9" /><path d="M12 7v5l3 2" /></symbol>
+      <symbol id="icon-upload" viewBox="0 0 24 24"><path d="M12 16V4m-4 4 4-4 4 4M5 13v6h14v-6" /></symbol>
+      <symbol id="icon-warning" viewBox="0 0 24 24"><path d="m12 3 10 18H2L12 3Z" /><path d="M12 9v5m0 3v.2" /></symbol>
+      <symbol id="icon-language" viewBox="0 0 24 24"><path d="M4 5h10M9 3v2m-3 4c1.5 3 4 5 7 6M13 8c-1 4-4 7-8 9M15 21l3-8 3 8m-5-3h4" /></symbol>
+      <symbol id="icon-user" viewBox="0 0 24 24"><circle cx="12" cy="8" r="4" /><path d="M4 21a8 8 0 0 1 16 0" /></symbol>
+      <symbol id="icon-help" viewBox="0 0 24 24"><circle cx="12" cy="12" r="9" /><path d="M9.8 9a2.3 2.3 0 1 1 3.5 2c-.9.5-1.3 1-1.3 2M12 17h.1" /></symbol>
+      <symbol id="icon-info" viewBox="0 0 24 24"><circle cx="12" cy="12" r="9" /><path d="M12 11v6m0-10v.2" /></symbol>
+      <symbol id="icon-book" viewBox="0 0 24 24"><path d="M4 5.5A3.5 3.5 0 0 1 7.5 2H12v18H7.5A3.5 3.5 0 0 0 4 23V5.5ZM20 5.5A3.5 3.5 0 0 0 16.5 2H12v18h4.5A3.5 3.5 0 0 1 20 23V5.5Z" /></symbol>
+      <symbol id="icon-clipboard" viewBox="0 0 24 24"><rect x="5" y="4" width="14" height="17" rx="2" /><path d="M9 4V2h6v2M8 9h8M8 13h8M8 17h5" /></symbol>
+      <symbol id="icon-trash" viewBox="0 0 24 24"><path d="M4 7h16M9 7V4h6v3M6 7l1 14h10l1-14M10 11v6M14 11v6" /></symbol>
+      <symbol id="icon-check-circle" viewBox="0 0 24 24"><circle cx="12" cy="12" r="9" /><path d="m8 12 2.5 2.5L16 9" /></symbol>
+      <symbol id="icon-x-circle" viewBox="0 0 24 24"><circle cx="12" cy="12" r="9" /><path d="m9 9 6 6m0-6-6 6" /></symbol>
+      <symbol id="icon-copy" viewBox="0 0 24 24"><rect x="8" y="8" width="11" height="12" rx="1" /><path d="M16 8V4H5v12h3" /></symbol>
+      <symbol id="icon-chevron-right" viewBox="0 0 24 24"><path d="m9 5 7 7-7 7" /></symbol>
+    </svg>
+    <header class="topbar">
+      <div class="brand">
+        <span class="brand-shield" aria-hidden="true"></span>
+        <span>HyperBDR</span>
+      </div>
+      <button class="hamburger" type="button" aria-label="菜单"><svg class="icon"><use href="#icon-menu" /></svg></button>
+      <nav class="topnav" aria-label="主导航">
+        <a href="#">概览</a>
+        <a class="active" href="#">资源容灾</a>
+        <a href="#">资源编排</a>
+        <a href="#">配置管理</a>
+        <a href="#">运维管理</a>
+        <a href="#">监控与告警管理</a>
+        <a href="#">设置</a>
+      </nav>
+      <div class="account-bar">
+        <span class="timezone"><svg class="icon"><use href="#icon-clock" /></svg> 我的时区： GMT+08:00</span>
+        <span class="round-notice"><svg class="icon"><use href="#icon-upload" /></svg><b>1</b></span>
+        <span class="alert-notice"><svg class="icon"><use href="#icon-warning" /></svg><b>99+</b></span>
+        <details class="language-switcher" data-i18n-ignore>
+          <summary class="language-trigger" aria-label="Language">
+            <svg class="icon language-icon" aria-hidden="true"><use href="#icon-language" /></svg>
+          </summary>
+          <div class="language-options" role="menu" aria-label="Language">
+            <button class="language-option" type="button" role="menuitem" data-locale="zh-CN" aria-pressed="false">简体中文</button>
+            <button class="language-option" type="button" role="menuitem" data-locale="en" aria-pressed="true">English</button>
+          </div>
+        </details>
+        <span class="account"><svg class="icon"><use href="#icon-user" /></svg>admin<svg class="icon chevron"><use href="#icon-chevron-down" /></svg></span>
+      </div>
+    </header>
+
+    <aside class="sidebar">
+      <div class="sidebar-heading"><svg class="icon"><use href="#icon-building" /></svg>资源容灾</div>
+      <a class="selected" href="#">主机容灾</a>
+      <a href="#">主机回切</a>
+      <button class="collapse-handle" type="button" aria-label="收起侧栏">‹</button>
+    </aside>
+
+    <main class="content">
+      <h1>主机容灾</h1>
+
+      <section class="workflow" aria-label="容灾流程">
+        <article class="step-card">
+          <div class="step-icon"><svg class="icon"><use href="#icon-cloud-server" /></svg></div>
+          <div>
+            <h2>1. 选择主机</h2>
+            <p>通过Agent或Agentless方式，</p>
+            <p>将待容灾主机添加到平台并勾选</p>
+            <p>[列表-已添加未配置的主机资源]</p>
+          </div>
+          <span class="step-state"></span>
+        </article>
+        <span class="workflow-arrow"><svg class="icon"><use href="#icon-chevrons-right" /></svg></span>
+        <article class="step-card">
+          <div class="step-icon cube"><svg class="icon"><use href="#icon-cube" /></svg></div>
+          <div>
+            <h2>2. 容灾配置</h2>
+            <p>对主机进行容灾配置：</p>
+            <p>容灾策略配置、存储配置、恢复平台配置等</p>
+            <p>[列表-待操作配置的主机资源]</p>
+          </div>
+          <span class="step-state"></span>
+        </article>
+        <span class="workflow-arrow"><svg class="icon"><use href="#icon-chevrons-right" /></svg></span>
+        <article class="step-card current">
+          <div class="step-icon cube"><svg class="icon"><use href="#icon-takeover" /></svg></div>
+          <div>
+            <h2>3. 开始容灾</h2>
+            <p>对已完成配置的主机操作：</p>
+            <p>数据同步、容灾接管、容灾演练等</p>
+            <p class="muted">[列表-已完成容灾配置的主机资源]</p>
+          </div>
+          <span class="step-state checked">✓</span>
+        </article>
+      </section>
+
+      <section class="host-panel">
+        <div class="toolbar">
+          <div class="action-group">
+            <button id="immediateSyncButton" class="action-btn faint" type="button" disabled><svg class="icon"><use href="#icon-cloud-up" /></svg>立即同步</button>
+            <button id="drillButton" class="action-btn drill" type="button" disabled><svg class="icon"><use href="#icon-cube" /></svg>容灾演练</button>
+            <button id="takeoverButton" class="action-btn takeover" type="button" disabled><svg class="icon"><use href="#icon-takeover" /></svg>容灾接管</button>
+            <button id="legacyTakeoverButton" class="action-btn takeover quick-takeover" type="button" disabled><svg class="icon"><use href="#icon-quick-takeover" /></svg>快速接管</button>
+            <div id="moreMenuWrap" class="more-menu-wrap">
+              <button id="moreButton" class="action-btn more" type="button" aria-haspopup="menu" aria-expanded="false">更多操作<svg class="icon chevron"><use href="#icon-chevron-down" /></svg></button>
+              <div id="moreMenu" class="more-menu" role="menu" hidden>
+                <button id="unregisterButton" class="more-menu-item" type="button" role="menuitem" disabled><svg class="icon"><use href="#icon-trash" /></svg>解除注册主机</button>
+                <button id="cleanupButton" class="more-menu-item" type="button" role="menuitem" disabled><svg class="icon"><use href="#icon-trash" /></svg>清理验证主机</button>
+              </div>
+            </div>
+          </div>
+          <div class="filter-group" aria-label="静态筛选工具">
+            <button class="select-like" type="button"><span>名称</span><svg class="icon chevron"><use href="#icon-chevron-down" /></svg></button>
+            <div class="search-like">请输入搜索内容</div>
+            <button class="icon-btn" type="button" aria-label="刷新"><svg class="icon"><use href="#icon-refresh" /></svg></button>
+            <button class="icon-btn" type="button" aria-label="标签"><svg class="icon"><use href="#icon-tag" /></svg></button>
+            <button class="icon-btn" type="button" aria-label="筛选"><svg class="icon"><use href="#icon-filter" /></svg></button>
+            <button class="icon-btn" type="button" aria-label="设置"><svg class="icon"><use href="#icon-settings" /></svg></button>
+          </div>
+        </div>
+
+        <div class="table-scroll">
+          <table class="host-table">
+            <thead>
+              <tr>
+                <th class="check-column"><input id="selectAll" type="checkbox" aria-label="全选主机" /></th>
+                <th>名称 <svg class="sort-icon"><use href="#icon-sort" /></svg></th>
+                <th>主机IP/ESXi IP <svg class="sort-icon"><use href="#icon-sort" /></svg></th>
+                <th>存储类型 <svg class="sort-icon"><use href="#icon-sort" /></svg></th>
+                <th>云平台 <svg class="sort-icon"><use href="#icon-sort" /></svg></th>
+                <th>操作系统类型 <svg class="sort-icon"><use href="#icon-sort" /></svg></th>
+                <th>主机状态 <svg class="sort-icon"><use href="#icon-sort" /></svg></th>
+                <th>任务状态 <svg class="sort-icon"><use href="#icon-sort" /></svg></th>
+                <th>启动状态 <svg class="sort-icon"><use href="#icon-sort" /></svg></th>
+                <th>健康状态 <svg class="sort-icon"><use href="#icon-sort" /></svg></th>
+                <th>策略 <svg class="sort-icon"><use href="#icon-sort" /></svg></th>
+              </tr>
+            </thead>
+            <tbody id="hostTableBody"></tbody>
+          </table>
+        </div>
+
+        <div class="panel-footer">
+          <span id="selectedCount">已选 0 条</span>
+          <div class="pagination">
+            <span id="totalCount">共 0 条</span>
+            <button type="button">30条/页⌄</button>
+            <button class="page-arrow" type="button" disabled>‹</button>
+            <button class="page current-page" type="button">1</button>
+            <button class="page-arrow" type="button" disabled>›</button>
+            <span>前往</span>
+            <label><input value="1" aria-label="页码" /> 页</label>
+          </div>
+        </div>
+      </section>
+
+      <section class="operation-notes" aria-labelledby="operationNotesTitle">
+        <div class="operation-notes-icon" aria-hidden="true"><svg class="icon"><use href="#icon-info" /></svg></div>
+        <div class="operation-notes-content">
+          <h2 id="operationNotesTitle">操作说明</h2>
+          <ol>
+            <li>使用快速接管后，该主机不可直接执行立即同步；完成清理验证后，方可重新同步。</li>
+            <li>快速接管后的主机重新同步时必须执行全量同步；与普通主机混选时，系统仅强制快速接管后的主机全量同步。</li>
+            <li>快速接管前需在第一步解绑主机已关联的策略；策略解绑后立即变为“无策略”，取消快速接管也不会自动恢复绑定。</li>
+            <li>容灾接管弹框仅支持从快照历史中选择恢复时间点；快速接管请使用独立入口。</li>
+            <li>快速接管使用云同步网关目标盘并固定展示主机的最新快照时间点，无需手动选择。</li>
+            <li>同步中的主机不可执行快速接管；同步失败的主机可以执行快速接管，但数据可能不完整。</li>
+          </ol>
+        </div>
+      </section>
+    </main>
+
+    <div class="float-tools" aria-hidden="true">
+      <span><svg class="icon"><use href="#icon-help" /></svg></span><span><svg class="icon"><use href="#icon-book" /></svg></span><span><svg class="icon"><use href="#icon-clipboard" /></svg></span>
+    </div>
+
+    <div id="syncModalOverlay" class="modal-overlay" hidden>
+      <section class="sync-modal" role="dialog" aria-modal="true" aria-labelledby="syncModalTitle" aria-describedby="syncModalIntro">
+        <header class="modal-header">
+          <h2 id="syncModalTitle">立即同步</h2>
+          <button id="syncModalClose" class="modal-close" type="button" aria-label="关闭立即同步弹框">×</button>
+        </header>
+        <div class="modal-body sync-modal-body">
+          <div class="snapshot-quota-notice">
+            <strong>快照配额提示：</strong>
+            <ol>
+              <li>没有关联策略的主机，默认创建快照的最大数量为 7 个。</li>
+              <li>如果主机关联了策略，以策略的配额为准。</li>
+              <li>请确认目标云平台允许创建快照的最大数量，策略的配额不能超过目标云平台允许创建的最大数量。</li>
+              <li>在快照配额不足时，同步数据会删除较旧时间点的快照。</li>
+              <li>如果配置过保留策略，产生了保留快照，在策略解绑后，快照配额不足时，同步数据也会删除保留快照。</li>
+            </ol>
+          </div>
+
+          <div id="rawFullSyncNotice" class="raw-full-sync-notice" role="note" hidden>
+            <svg class="icon" aria-hidden="true"><use href="#icon-warning" /></svg>
+            <div>
+              <strong>全量同步提示：</strong>
+              <span>快速接管后的主机必须执行全量同步。混选时，即使未勾选“强制全量同步”，此类主机仍将自动执行全量同步。</span>
+            </div>
+          </div>
+
+          <p id="syncModalIntro" class="modal-intro sync-modal-intro">以下资源将进行立即同步，数量 <span id="syncModalCount">0</span>：</p>
+          <div class="modal-table-scroll sync-modal-table-scroll">
+            <table class="modal-table sync-modal-table">
+              <thead>
+                <tr>
+                  <th>名称 <svg class="sort-icon"><use href="#icon-sort" /></svg></th>
+                  <th>主机IP/ESXi IP <svg class="sort-icon"><use href="#icon-sort" /></svg></th>
+                  <th>存储类型 <svg class="sort-icon"><use href="#icon-sort" /></svg></th>
+                  <th>云平台 <svg class="sort-icon"><use href="#icon-sort" /></svg></th>
+                  <th>健康状态 <svg class="sort-icon"><use href="#icon-sort" /></svg></th>
+                  <th>CPU <svg class="sort-icon"><use href="#icon-sort" /></svg></th>
+                </tr>
+              </thead>
+              <tbody id="syncModalHostBody"></tbody>
+            </table>
+          </div>
+
+          <div class="advanced-section sync-advanced-section">
+            <button id="syncAdvancedToggle" class="advanced-toggle" type="button" aria-expanded="true">
+              高级设置 <svg class="icon chevron"><use href="#icon-chevron-down" /></svg>
+            </button>
+            <div id="syncAdvancedContent" class="advanced-content sync-advanced-content">
+              <label class="force-sync-option">
+                <input id="forceFullSyncCheckbox" type="checkbox" />
+                <span><em>（不推荐）</em>强制全量同步</span>
+              </label>
+              <p>注意：默认情况下，首次同步是全量同步，随后的同步则为增量同步。如果需要在已开始增量同步后重新进行全量同步以确保数据完整性，可以选择强制进行全量同步。</p>
+            </div>
+          </div>
+        </div>
+        <footer class="modal-footer">
+          <button id="syncModalCancel" class="modal-cancel" type="button">取消</button>
+          <button id="syncModalConfirm" class="modal-confirm" type="button">确定</button>
+        </footer>
+      </section>
+    </div>
+
+    <div id="modalOverlay" class="modal-overlay" hidden>
+      <section class="takeover-modal current-takeover-modal" role="dialog" aria-modal="true" aria-labelledby="modalTitle">
+        <header class="modal-header">
+          <h2 id="modalTitle">容灾接管</h2>
+          <button id="modalClose" class="modal-close" type="button" aria-label="关闭">×</button>
+        </header>
+        <div class="modal-body">
+          <p class="modal-intro">以下资源将进行容灾接管，数量 <span id="modalCount">0</span>：</p>
+          <div class="modal-table-scroll">
+            <table class="modal-table">
+              <thead>
+                <tr>
+                  <th>名称 <svg class="sort-icon"><use href="#icon-sort" /></svg></th>
+                  <th>主机IP/ESXi IP <svg class="sort-icon"><use href="#icon-sort" /></svg></th>
+                  <th>存储类型 <svg class="sort-icon"><use href="#icon-sort" /></svg></th>
+                  <th>云平台 <svg class="sort-icon"><use href="#icon-sort" /></svg></th>
+                  <th>主机状态</th>
+                  <th>健康状态</th>
+                  <th>恢复时间点</th>
+                </tr>
+              </thead>
+              <tbody id="modalHostBody"></tbody>
+            </table>
+          </div>
+
+          <div class="advanced-section">
+            <button id="advancedToggle" class="advanced-toggle" type="button" aria-expanded="false" disabled>
+              高级设置 <svg class="icon chevron"><use href="#icon-chevron-down" /></svg>
+            </button>
+          </div>
+        </div>
+        <footer class="modal-footer">
+          <button id="modalCancel" class="modal-cancel" type="button">取消</button>
+          <button id="modalConfirm" class="modal-confirm" type="button">确定</button>
+        </footer>
+      </section>
+    </div>
+
+    <div id="legacyTakeoverModalOverlay" class="modal-overlay" hidden>
+      <section class="takeover-modal legacy-takeover-modal" role="dialog" aria-modal="true" aria-labelledby="legacyTakeoverModalTitle">
+        <header class="modal-header">
+          <h2 id="legacyTakeoverModalTitle">快速接管</h2>
+          <button id="legacyTakeoverModalClose" class="modal-close" type="button" aria-label="关闭快速接管弹框">×</button>
+        </header>
+        <div class="quick-takeover-steps" aria-label="快速接管步骤">
+          <div id="quickPolicyStepIndicator" class="quick-step is-active" aria-current="step">
+            <span class="quick-step-marker">1</span>
+            <span>解绑策略</span>
+          </div>
+          <div id="quickTakeoverStepIndicator" class="quick-step">
+            <span class="quick-step-marker">2</span>
+            <span>快速接管</span>
+          </div>
+        </div>
+        <div class="modal-body">
+          <section id="quickPolicyStep" class="quick-step-panel" aria-labelledby="quickPolicyStepIndicator">
+            <div class="takeover-notice quick-policy-notice" role="note">
+              <strong>解绑策略提示：</strong>
+              <ol>
+                <li>快速接管将使用云同步网关目标盘，接管后不能再同步。</li>
+                <li>需先解绑所选主机的关联策略，避免策略继续触发同步任务。</li>
+                <li>策略解绑后立即生效，即使取消快速接管，也不会自动恢复绑定。</li>
+              </ol>
+            </div>
+            <p id="quickPolicySummary" class="quick-policy-summary">已选择的主机：已选择 <strong>0</strong> 台主机，其中 <strong>0</strong> 台需要解除策略绑定。</p>
+            <div class="modal-table-scroll quick-policy-table-scroll">
+              <table class="modal-table quick-policy-table">
+                <thead>
+                  <tr>
+                    <th>名称 <svg class="sort-icon"><use href="#icon-sort" /></svg></th>
+                    <th>主机IP/ESXi IP <svg class="sort-icon"><use href="#icon-sort" /></svg></th>
+                    <th>主机状态</th>
+                    <th>健康状态</th>
+                    <th>策略</th>
+                  </tr>
+                </thead>
+                <tbody id="quickPolicyHostBody"></tbody>
+              </table>
+            </div>
+          </section>
+
+          <section id="quickTakeoverStep" class="quick-step-panel" aria-labelledby="quickTakeoverStepIndicator" hidden>
+            <section class="quick-takeover-risk-notice" role="alert">
+              <strong>风险提示：</strong>
+              <ol>
+                <li>快速接管后，主机无法再同步，需解除注册并重新配置后方可同步。</li>
+                <li>同步失败的主机可能存在数据不完整的风险，请确认后继续操作。</li>
+                <li>同步中的主机无法执行快速接管，请同步结束后再操作。</li>
+              </ol>
+            </section>
+
+            <section class="quick-takeover-host-section">
+              <div class="modal-table-scroll quick-takeover-list-scroll">
+                <table class="modal-table legacy-takeover-table quick-takeover-table">
+                  <thead>
+                    <tr>
+                      <th class="quick-takeover-selection-column">
+                        <input id="quickTakeoverSelectAll" type="checkbox" aria-label="全选主机" />
+                      </th>
+                      <th>名称 <svg class="sort-icon"><use href="#icon-sort" /></svg></th>
+                      <th>主机IP/ESXi IP <svg class="sort-icon"><use href="#icon-sort" /></svg></th>
+                      <th>云平台 <svg class="sort-icon"><use href="#icon-sort" /></svg></th>
+                      <th id="quickTakeoverStatusHeader" aria-sort="ascending">
+                        <button id="quickTakeoverStatusSortButton" class="table-sort-button" type="button" title="按主机状态降序排列">
+                          主机状态 <svg class="sort-icon" aria-hidden="true"><use href="#icon-sort" /></svg>
+                        </button>
+                      </th>
+                      <th>最后同步时间</th>
+                    </tr>
+                  </thead>
+                  <tbody id="quickTakeoverHostBody"></tbody>
+                </table>
+              </div>
+            </section>
+
+            <p id="quickTakeoverSummary" class="quick-takeover-summary">共 <strong>0</strong> 台主机，已选择 <strong>0</strong> 台，跳过 <strong>0</strong> 台，不可选 <strong>0</strong> 台。</p>
+
+          </section>
+        </div>
+        <footer class="modal-footer quick-takeover-footer">
+          <button id="legacyTakeoverModalCancel" class="modal-cancel" type="button">取消</button>
+          <button id="quickTakeoverBack" class="modal-cancel" type="button" hidden>上一步</button>
+          <button id="quickUnbindPoliciesButton" class="modal-confirm" type="button">解除策略绑定</button>
+          <button id="quickTakeoverNext" class="modal-confirm" type="button" disabled>下一步</button>
+          <button id="legacyTakeoverModalConfirm" class="modal-confirm" type="button" hidden disabled>确认快速接管</button>
+        </footer>
+      </section>
+    </div>
+
+    <div id="drillModalOverlay" class="modal-overlay" hidden>
+      <section class="drill-modal" role="dialog" aria-modal="true" aria-labelledby="drillModalTitle" aria-describedby="drillModalIntro">
+        <header class="modal-header">
+          <h2 id="drillModalTitle">容灾演练</h2>
+          <button id="drillModalClose" class="modal-close" type="button" aria-label="关闭容灾演练弹框">×</button>
+        </header>
+        <div class="modal-body">
+          <p id="drillModalIntro" class="modal-intro">以下资源将进行容灾演练，数量 <span id="drillModalCount">0</span>：</p>
+          <div class="modal-table-scroll">
+            <table class="modal-table drill-modal-table">
+              <thead>
+                <tr>
+                  <th>名称 <svg class="sort-icon"><use href="#icon-sort" /></svg></th>
+                  <th>主机IP/ESXi IP <svg class="sort-icon"><use href="#icon-sort" /></svg></th>
+                  <th>存储类型 <svg class="sort-icon"><use href="#icon-sort" /></svg></th>
+                  <th>云平台 <svg class="sort-icon"><use href="#icon-sort" /></svg></th>
+                  <th>健康状态</th>
+                  <th>恢复时间点</th>
+                </tr>
+              </thead>
+              <tbody id="drillModalHostBody"></tbody>
+            </table>
+          </div>
+
+          <div id="drillExistingRawNotice" class="existing-raw-warning" role="alert" hidden>
+            风险提示：所选主机中包含已使用快速接管的主机，本次操作会清理掉接管主机，但不会删除云同步网关目标盘。
+          </div>
+
+          <div class="advanced-section">
+            <button id="drillAdvancedToggle" class="advanced-toggle" type="button" aria-expanded="false" disabled>
+              高级设置 <svg class="icon chevron"><use href="#icon-chevron-down" /></svg>
+            </button>
+          </div>
+        </div>
+        <footer class="modal-footer">
+          <button id="drillModalCancel" class="modal-cancel" type="button">取消</button>
+          <button id="drillModalConfirm" class="modal-confirm" type="button">确定</button>
+        </footer>
+      </section>
+    </div>
+
+    <div id="cleanupConfirmOverlay" class="modal-overlay" hidden>
+      <section class="host-action-modal cleanup-confirm-modal" role="dialog" aria-modal="true" aria-labelledby="cleanupConfirmTitle" aria-describedby="cleanupConfirmIntro">
+        <header class="host-action-header">
+          <div class="host-action-title">
+            <svg class="icon" aria-hidden="true"><use href="#icon-x-circle" /></svg>
+            <h2 id="cleanupConfirmTitle">清理验证主机</h2>
+          </div>
+          <button id="cleanupConfirmClose" class="modal-close" type="button" aria-label="关闭清理验证主机弹框">×</button>
+        </header>
+        <div class="host-action-body">
+          <p id="cleanupConfirmIntro" class="modal-intro">以下资源将进行清理验证主机，数量 <span id="cleanupConfirmCount">0</span>：</p>
+          <div class="modal-table-scroll host-action-table-scroll">
+            <table class="modal-table cleanup-confirm-table">
+              <thead>
+                <tr>
+                  <th>名称 <svg class="sort-icon"><use href="#icon-sort" /></svg></th>
+                  <th>主机IP/ESXi IP <svg class="sort-icon"><use href="#icon-sort" /></svg></th>
+                  <th>启动状态 <svg class="sort-icon"><use href="#icon-sort" /></svg></th>
+                  <th>健康状态 <svg class="sort-icon"><use href="#icon-sort" /></svg></th>
+                  <th>存储类型 <svg class="sort-icon"><use href="#icon-sort" /></svg></th>
+                  <th>云平台 <svg class="sort-icon"><use href="#icon-sort" /></svg></th>
+                </tr>
+              </thead>
+              <tbody id="cleanupConfirmHostBody"></tbody>
+            </table>
+          </div>
+
+          <div id="cleanupRawTakeoverNotice" class="existing-raw-warning" role="alert" hidden>
+            风险提示：所选主机中包含快速接管主机，本次操作不会清理云同步网关目标盘，但会清理创建的接管主机。
+          </div>
+
+          <div class="advanced-section host-action-advanced">
+            <button id="cleanupConfirmAdvancedToggle" class="advanced-toggle" type="button" aria-expanded="true">
+              高级设置 <svg class="icon chevron"><use href="#icon-chevron-down" /></svg>
+            </button>
+            <div id="cleanupConfirmAdvancedContent" class="advanced-content host-action-advanced-content">
+              <label class="host-action-acknowledgement">
+                <input id="cleanupConfirmAcknowledgement" type="checkbox" />
+                <span>我确认清理验证主机。</span>
+              </label>
+            </div>
+          </div>
+        </div>
+        <footer class="modal-footer host-action-footer">
+          <button id="cleanupConfirmCancel" class="modal-cancel" type="button">取消</button>
+          <button id="cleanupConfirmSubmit" class="modal-confirm" type="button" disabled>确定</button>
+        </footer>
+      </section>
+    </div>
+
+    <div id="unregisterConfirmOverlay" class="modal-overlay" hidden>
+      <section class="host-action-modal unregister-confirm-modal" role="dialog" aria-modal="true" aria-labelledby="unregisterConfirmTitle" aria-describedby="unregisterConfirmIntro">
+        <header class="host-action-header">
+          <div class="host-action-title">
+            <svg class="icon" aria-hidden="true"><use href="#icon-x-circle" /></svg>
+            <h2 id="unregisterConfirmTitle">解除注册主机</h2>
+          </div>
+          <button id="unregisterConfirmClose" class="modal-close" type="button" aria-label="关闭解除注册主机弹框">×</button>
+        </header>
+        <div class="host-action-body">
+          <section class="unregister-guidance-notice">
+            <strong>解除注册主机提示：</strong>
+            <ol>
+              <li>在解除注册主机时，不会清理云上已经启动的主机。</li>
+              <li>在安装了源端代理程序的主机上，解除注册主机后，如果要重新安装源端代理程序请先手动清理残留资源，再进行安装。</li>
+              <li>在解除注册主机后，对象存储数据会在 3 分钟后删除。</li>
+            </ol>
+            <strong>强制解除注册主机提示：</strong>
+            <p>对于已经失联的主机，需要使用强制解除注册。</p>
+          </section>
+
+          <section class="unregister-important-notice">
+            <strong>重要提示：</strong>
+            <ul>
+              <li>解除注册可能会影响系统的容灾保护能力，请谨慎操作！</li>
+              <li>请确认目标平台上的所有主机均已完成容灾，否则相关备份数据将被清理，且无法在故障后进行接管恢复。</li>
+            </ul>
+          </section>
+
+          <p id="unregisterConfirmIntro" class="modal-intro">以下资源将进行解除注册主机，数量 <span id="unregisterConfirmCount">0</span>：</p>
+          <div class="modal-table-scroll host-action-table-scroll unregister-table-scroll">
+            <table class="modal-table unregister-confirm-table">
+              <thead>
+                <tr>
+                  <th>名称 <svg class="sort-icon"><use href="#icon-sort" /></svg></th>
+                  <th>主机IP/ESXi IP <svg class="sort-icon"><use href="#icon-sort" /></svg></th>
+                  <th>存储类型 <svg class="sort-icon"><use href="#icon-sort" /></svg></th>
+                  <th>云平台 <svg class="sort-icon"><use href="#icon-sort" /></svg></th>
+                  <th>健康状态 <svg class="sort-icon"><use href="#icon-sort" /></svg></th>
+                  <th>CPU <svg class="sort-icon"><use href="#icon-sort" /></svg></th>
+                </tr>
+              </thead>
+              <tbody id="unregisterConfirmHostBody"></tbody>
+            </table>
+          </div>
+
+          <label class="host-action-acknowledgement unregister-acknowledgement">
+            <input id="unregisterConfirmAcknowledgement" type="checkbox" />
+            <span>我已知晓解除注册的影响，并确认继续执行。</span>
+          </label>
+
+          <div class="host-action-divider"></div>
+
+          <div class="advanced-section host-action-advanced unregister-advanced">
+            <button class="advanced-toggle" type="button" aria-expanded="false" disabled>
+              高级设置 <svg class="icon chevron"><use href="#icon-chevron-down" /></svg>
+            </button>
+          </div>
+        </div>
+        <footer class="modal-footer host-action-footer">
+          <button id="unregisterConfirmCancel" class="modal-cancel" type="button">取消</button>
+          <button id="unregisterConfirmSubmit" class="modal-confirm" type="button" disabled>确定</button>
+        </footer>
+      </section>
+    </div>
+
+    <div id="taskDrawerOverlay" class="task-drawer-overlay" hidden>
+      <aside class="task-drawer" role="dialog" aria-modal="true" aria-labelledby="taskDrawerTitle">
+        <header class="task-drawer-header">
+          <h2 id="taskDrawerTitle">任务详情</h2>
+          <button id="taskDrawerClose" class="task-drawer-close" type="button" aria-label="关闭任务详情">×</button>
+        </header>
+        <div class="task-drawer-body">
+          <div class="task-meta">
+            <p><span>所属：</span><strong id="drawerHostName"></strong></p>
+            <p><span>描述：</span><strong id="drawerDescription">开始构建实例</strong></p>
+            <p><span>详情：</span><b class="static-detail-control">收起⌄</b></p>
+          </div>
+
+          <div class="drawer-divider"></div>
+          <div class="steps-heading">
+            <strong>步骤</strong>
+            <span><strong>执行时间</strong><svg class="icon"><use href="#icon-refresh" /></svg></span>
+          </div>
+
+          <div id="standardTaskTimeline" class="task-timeline">
+            <section class="timeline-step completed">
+              <span class="timeline-marker"><svg class="icon"><use href="#icon-check-circle" /></svg></span>
+              <div class="timeline-content">
+                <div class="timeline-line"><time>2026-07-15 15:28:30 GMT+08:00</time><span>00:00:00</span></div>
+                <p class="timeline-title">开始构建实例</p>
+              </div>
+            </section>
+
+            <section id="drawerParameterStep" class="timeline-step completed has-children">
+              <span class="timeline-marker"><svg class="icon"><use href="#icon-check-circle" /></svg></span>
+              <div class="timeline-content">
+                <div class="timeline-line"><time>2026-07-15 15:28:30 GMT+08:00</time><span>00:00:00</span></div>
+                <p class="timeline-title">准备启动参数</p>
+                <div class="timeline-children">
+                  <div class="timeline-child source-child">
+                    <span class="child-check">✓</span>
+                    <div><p id="drawerSnapshotSource"></p><time id="drawerSnapshotTime"></time></div>
+                  </div>
+                  <div id="drawerCancelPolicyStep" class="timeline-child" hidden><span class="child-check">✓</span><p>确认主机策略已解绑</p></div>
+                  <div class="timeline-child"><span class="child-check">✓</span><p>获取启动磁盘信息</p></div>
+                  <div class="timeline-child"><span class="child-check">✓</span><p>获取启动卷信息</p></div>
+                  <div class="timeline-child"><span class="child-check">✓</span><p>获取卷快照信息</p></div>
+                </div>
+              </div>
+            </section>
+
+            <section id="drawerFinalStep" class="timeline-step final-step loading">
+              <span id="drawerFinalMarker" class="timeline-marker"></span>
+              <div class="timeline-content">
+                <div class="timeline-line"><time>2026-07-15 15:28:30 GMT+08:00</time><span>00:00:00</span></div>
+                <p class="timeline-title">开始构建实例</p>
+                <div class="final-result">
+                  <span id="drawerFinalResultIcon" class="result-icon"></span>
+                  <span id="drawerFinalResultText">等待系统启动</span>
+                </div>
+                <div class="drawer-static-actions">
+                  <span>查看详情 <svg class="icon"><use href="#icon-chevron-right" /></svg></span>
+                  <span><svg class="icon"><use href="#icon-copy" /></svg>复制</span>
+                </div>
+              </div>
+            </section>
+          </div>
+          <div id="errorTaskTimeline" class="task-timeline task-error-timeline" hidden></div>
+        </div>
+      </aside>
+    </div>
+
+    <script src="translations.js"></script>
+    <script src="i18n.js"></script>
+  </body>
+</html>
