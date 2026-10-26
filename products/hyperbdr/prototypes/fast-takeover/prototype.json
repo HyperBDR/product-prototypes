@@ -1,0 +1,12 @@
+{
+  "id": "fast-takeover",
+  "name": "HyperBDR Fast Takeover",
+  "description": "HyperBDR Host Disaster Recovery Management Interface Prototype.",
+  "status": "draft",
+  "owner": "",
+  "tags": ["takeover", "fast-takeover", "hyperbdr"],
+  "entry": "index.html",
+  "thumbnail": "thumbnail.svg",
+  "visible": true,
+  "order": 20
+}
