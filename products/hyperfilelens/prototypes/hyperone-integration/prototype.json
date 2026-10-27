@@ -1,0 +1,12 @@
+{
+  "id": "hyperone-integration",
+  "name": "HyperOne Integration Depth",
+  "description": "Interactive comparison of four HyperFileLens, HyperBDR and HyperCDR integration proposals.",
+  "status": "review",
+  "owner": "HyperBDR Product Design",
+  "tags": ["hyperone", "hyperfilelens", "hyperbdr", "hypercdr", "integration"],
+  "entry": "index.html",
+  "thumbnail": "thumbnail.svg",
+  "visible": true,
+  "order": 10
+}
