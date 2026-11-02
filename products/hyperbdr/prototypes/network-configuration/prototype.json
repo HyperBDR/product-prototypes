@@ -1,0 +1,12 @@
+{
+  "id": "network-configuration",
+  "name": "HyperBDR Network Configuration",
+  "description": "HyperBDR Host Disaster Recovery Network Configuration Prototype (Step 5 & Edit Mode).",
+  "status": "draft",
+  "owner": "",
+  "tags": ["network", "network-configuration", "hyperbdr"],
+  "entry": "index.html",
+  "thumbnail": "thumbnail.svg",
+  "visible": true,
+  "order": 30
+}
