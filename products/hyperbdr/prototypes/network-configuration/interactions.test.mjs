@@ -127,7 +127,7 @@ test("manual IP validates actual selected subnet", () => {
   );
   assert.equal(a.run("validateAll().length"), 0);
   a.run("state.hosts['host-1'].single.privateIp='172.16.10.10'");
-  assert.match(a.run("validateAll()[0]"), /不在子网/);
+  assert.match(a.run("validateAll()[0]"), /outside the usable range|不在子网/);
 });
 test("original IP is selected from source host and validated", () => {
   const a = app();
@@ -143,7 +143,7 @@ test("original IP is selected from source host and validated", () => {
 test("security groups are required", () => {
   const a = app();
   a.run("state.hosts['host-1'].single.groups=[]");
-  assert.match(a.run("validateAll()[0]"), /安全组/);
+  assert.match(a.run("validateAll()[0]"), /security group|安全组/i);
 });
 test("new EIP bandwidth must be integer between 1 and 300", () => {
   const a = app();
@@ -225,11 +225,11 @@ test("duplicates are detected across NICs and hosts on same network", () => {
   a.run(
     "state.hosts['host-1'].nics.forEach(n=>Object.assign(n,{privateMode:'manual',privateIp:'10.0.0.10'}))"
   );
-  assert.match(a.run("validateAll().join()"), /重复/);
+  assert.match(a.run("validateAll().join()"), /duplicate|重复/i);
   a.run(
     "state.mode='single';state.selected.push('host-2');state.selected.forEach(id=>Object.assign(state.hosts[id].single,{privateMode:'manual',privateIp:'10.0.0.11'}))"
   );
-  assert.match(a.run("validateAll().join()"), /重复/);
+  assert.match(a.run("validateAll().join()"), /duplicate|重复/i);
 });
 test("same fixed IP on distinct virtual networks is not flagged as duplicate", () => {
   const a = app();
@@ -245,7 +245,7 @@ test("existing EIP cannot be assigned to two NICs", () => {
   a.click("multiple");
   a.click("add");
   a.run("state.hosts['host-1'].nics.forEach(n=>n.publicMode='existing')");
-  assert.match(a.run("validateAll().join()"), /公网 IP.*已被/);
+  assert.match(a.run("validateAll().join()"), /already used|公网 IP.*已被/i);
 });
 test("payload contains current mode and only active IP allocation fields", () => {
   const a = app();
@@ -394,7 +394,7 @@ test("creation NIC limits are 12 for Linux and 2 for Windows, enforced per host"
   const html = a.run("renderMultiple()");
   assert.match(html, /12 \/ 12/);
   assert.match(html, /2 \/ 2/);
-  assert.match(html, /最多为 2个/);
+  assert.match(html, /maximum number of target NICs is\s+2|最多为 2个/);
   a.click("remove", "create-windows", 0);
   assert.equal(a.run("state.hosts['create-windows'].nics.length"), 2);
   a.click("remove", "create-windows", 1);
@@ -742,13 +742,13 @@ test("saving independent networks validates both purposes, not just the visible 
   a.run(
     "setTakeoverInheritance(false);networkPlans.edit.takeover.hosts['host-1'].single.groups=[]"
   );
-  assert.match(a.run("validateNetworkPlan().join()"), /接管网络.*安全组/);
+  assert.match(a.run("validateNetworkPlan().join()"), /Takeover Network:.*security group|接管网络.*安全组/i);
   a.click("save");
   assert.equal(a.storage.size, 0);
   a.run(
     "networkPlans.edit.takeover.hosts['host-1'].single.groups=['sg-ray'];networkPlans.edit.drill.hosts['host-1'].single.groups=[];setNetworkPurpose('takeover')"
   );
-  assert.match(a.run("validateNetworkPlan().join()"), /演练网络.*安全组/);
+  assert.match(a.run("validateNetworkPlan().join()"), /Drill Network:.*security group|演练网络.*安全组/i);
   a.click("save");
   assert.equal(a.storage.size, 0);
 });
@@ -912,24 +912,24 @@ test("all literal translation keys in static markup and application code exist",
   assert.ok(html.indexOf('src="i18n.js"') < html.indexOf('src="app.js"'));
 });
 
-test("language preference defaults to Chinese and can persist independently", () => {
+test("language preference defaults to English and can persist independently", () => {
   const a = app();
-  assert.equal(a.run("currentLanguage"), "zh");
-  a.run("setLanguage('en')");
   assert.equal(a.run("currentLanguage"), "en");
-  assert.equal(a.storage.get("hyperbdr-network-language-v1"), "en");
+  a.run("setLanguage('zh')");
+  assert.equal(a.run("currentLanguage"), "zh");
+  assert.equal(a.storage.get("hyperbdr-network-language-v1"), "zh");
   assert.equal(a.storage.has("hyperbdr-network-prototype-v2"), false);
   const restored = app(null, {
     language: a.storage.get("hyperbdr-network-language-v1")
   });
-  assert.equal(restored.run("t('drConfig.singleNic')"), "Single NIC");
+  assert.equal(restored.run("t('drConfig.singleNic')"), "单网卡");
 });
 
 test("unsupported stored and requested languages fail safely", () => {
   const a = app(null, { language: "fr" });
-  assert.equal(a.run("currentLanguage"), "zh");
+  assert.equal(a.run("currentLanguage"), "en");
   assert.equal(a.run("setLanguage('fr')"), false);
-  assert.equal(a.run("currentLanguage"), "zh");
+  assert.equal(a.run("currentLanguage"), "en");
 });
 
 test("switching language never changes plans, saved data, inheritance or NIC IDs", () => {
@@ -979,13 +979,14 @@ test("IP option labels and NIC summaries are localized at render time", () => {
   const a = app();
   assert.equal(
     a.run("ipSummary(state.hosts['host-1'].single,HOSTS[0])"),
+    "Not Specified(Auto Assign)"
+  );
+  a.run("setLanguage('zh')");
+  assert.equal(
+    a.run("ipSummary(state.hosts['host-1'].single,HOSTS[0])"),
     "不指定（自动分配）"
   );
   a.run("setLanguage('en')");
-  assert.equal(
-    a.run("ipSummary(state.hosts['host-1'].single,HOSTS[0])"),
-    "Not Specified(Auto Assign)"
-  );
   const options = a.json("localizedOptions(PUBLIC_MODES)");
   assert.deepEqual(options.map(item => item[0]), [
     "none",
