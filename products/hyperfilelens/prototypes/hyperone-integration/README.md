@@ -10,7 +10,11 @@ HyperFileLens, HyperBDR and HyperCDR under one product workspace.
   does not prove recovery validation or business availability.
 - The product workspace switches between all capabilities and a focused
   HyperFileLens, HyperBDR or HyperCDR experience.
-- Product overview pages preserve product-specific terminology and workflows.
+- Capability entries open protection workspaces directly; standalone product
+  overview pages preserve product-specific terminology and workflows.
+- The top-level Platform overview label stays consistent across capabilities.
+- Source and node configuration share the configuration center, with enrollment
+  actions in the first protection step and legacy entry filters preserved.
 - Professional pages retain product-specific menus and configuration flows.
 - Dashboard metrics open matching existing resource or task menu pages, preserving
   the selected scope through reloads and offering a clear-filter action.
@@ -18,8 +22,8 @@ HyperFileLens, HyperBDR and HyperCDR under one product workspace.
   layout. Healthy connection badges are hidden; simulated unavailable statistics
   and unconnected capabilities have distinct explanations.
 
-Source snapshot: `oneprolabs/hyperfilelens` commit `dce09074`
-(`Refine HyperOne platform prototype`). Only prebuilt, directory-local static
+Source snapshot: `oneprolabs/hyperfilelens` commit `ad7b0656`
+(`Unify HyperOne capability workspace navigation`). Only prebuilt, directory-local static
 assets are published here; no source build tooling or dependencies are added.
 
 All data and operations are local fictional samples. The prototype does not
