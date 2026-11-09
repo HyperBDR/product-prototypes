@@ -28,13 +28,22 @@ HyperFileLens, HyperBDR and HyperCDR under one product workspace.
 - Professional pages retain product-specific menus and configuration flows.
 - Dashboard metrics open matching existing resource or task menu pages, preserving
   the selected scope through reloads and offering a clear-filter action.
+- Unresolved-alert drilldowns include firing and acknowledged alerts only, using
+  the same available-capability scope as the overview. Reset restores all alerts.
+- Source, storage, task and alert lists expose consistent scope filters; reset
+  clears both local conditions and inherited dashboard filters.
+- Coverage metrics open the matching capability configuration step. Resource
+  attention and storage checks preserve the metric's assessment scope.
+- Runtime events, tasks, execution logs and operation audits offer related-record
+  navigation with resource, correlation and time-window context in the URL.
+- Recovery-point assessments distinguish observed evidence from unknown status;
+  execution success is not presented as proof of recovery validation.
 - Alerts/events, execution results and storage capacity retain a compact dashboard
   layout. Healthy connection badges are hidden; simulated unavailable statistics
   and unconnected capabilities have distinct explanations.
 
-Source snapshot: `oneprolabs/hyperfilelens` commit `5bbb2441`
-(`Restore the current host failback workflow`), including `add8cd43`
-(`Keep container tasks in operations navigation`). Only prebuilt, directory-local static
+Source snapshot: `oneprolabs/hyperfilelens` commit `f1f56ec204196018da7231f0844ba2efed7bb3bd`
+(`Align HyperOne overview drilldowns and filters`). Only prebuilt, directory-local static
 assets are published here; no source build tooling or dependencies are added.
 
 All data and operations are local fictional samples. The prototype does not
