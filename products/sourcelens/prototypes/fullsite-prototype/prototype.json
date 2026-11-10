@@ -1,0 +1,12 @@
+{
+  "id": "fullsite-prototype",
+  "name": "SourceLens 全站交互原型（多租户治理）",
+  "description": "SourceLens 全站页面交互原型：用户端、租户管理员、平台超级管理员三个视角，覆盖多租户治理、助手、知识库、连接、能力市场、模型配置、API Key、节点与全局配置等；示例数据已脱敏。",
+  "status": "review",
+  "owner": "Ray",
+  "tags": ["sourcelens", "multi-tenant", "admin-console", "full-site"],
+  "entry": "index.html",
+  "thumbnail": "thumbnail.svg",
+  "visible": true,
+  "order": 5
+}

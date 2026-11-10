@@ -1,0 +1,181 @@
+<!doctype html>
+<html lang="zh-CN">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width,initial-scale=1">
+<title>SourceLens 治理地图 v0.6</title>
+<style>
+:root{--bg:#f9fafb;--card:#fff;--fg:#111827;--fg2:#4b5563;--fg3:#9ca3af;--line:#e5e7eb;--acc:#2b4ee6;--accs:#eef4fe;--ok:#047857;--oks:#ecfdf5;--warn:#b45309;--warns:#fffbeb;--bad:#b91c1c;--bads:#fef2f2;--p:#6d28d9;--ps:#f5f3ff}
+@media(prefers-color-scheme:dark){:root{--bg:#1e1e1e;--card:#252526;--fg:#e5e7eb;--fg2:#b0b4ba;--fg3:#7d828a;--line:#3a3d41;--acc:#7b93ff;--accs:#26304f;--ok:#4ade80;--oks:#17301f;--warn:#fbbf24;--warns:#3a2e12;--bad:#f87171;--bads:#3b1c1c;--p:#c4b5fd;--ps:#2e2650}}
+*{box-sizing:border-box}body{margin:0;background:var(--bg);color:var(--fg);font:14px/1.65 "Plus Jakarta Sans","Noto Sans SC",system-ui,sans-serif}
+.w{max-width:1080px;margin:0 auto;padding:28px 16px 80px}
+h1{font-size:26px;margin:0 0 4px}h2{font-size:18px;margin:38px 0 10px;padding-top:6px;border-top:1px solid var(--line)}h3{font-size:14px;margin:18px 0 6px}
+p,li{color:var(--fg2)}.sub{color:var(--fg3);margin:0 0 18px}
+.tabs{position:sticky;top:0;background:var(--bg);padding:8px 0;display:flex;gap:6px;flex-wrap:wrap;z-index:2;border-bottom:1px solid var(--line)}
+.tabs a{color:var(--fg2);text-decoration:none;padding:4px 10px;border-radius:99px;font-size:12px;border:1px solid var(--line);background:var(--card)}
+.card{background:var(--card);border:1px solid var(--line);border-radius:12px;padding:14px 16px;overflow-x:auto}
+.g3{display:grid;grid-template-columns:repeat(3,1fr);gap:12px}.g2{display:grid;grid-template-columns:repeat(2,1fr);gap:12px}
+@media(max-width:820px){.g3,.g2{grid-template-columns:1fr}}
+table{border-collapse:collapse;width:100%;font-size:13px;min-width:560px}th,td{text-align:left;padding:7px 10px;border-bottom:1px solid var(--line);vertical-align:top}th{font-size:12px;color:var(--fg3);font-weight:600;white-space:nowrap}
+tr:last-child td{border-bottom:0}
+.t{display:inline-block;font-size:11px;padding:1px 8px;border-radius:99px;font-weight:600;white-space:nowrap}
+.y{background:var(--oks);color:var(--ok)}.n{background:var(--bads);color:var(--bad)}.l{background:var(--warns);color:var(--warn)}.a{background:var(--accs);color:var(--acc)}.pp{background:var(--ps);color:var(--p)}.z{color:var(--fg3)}
+.zone{border-left:4px solid var(--acc)}.zone.z2{border-color:var(--ok)}.zone.z3{border-color:var(--p)}
+code{font:12px "JetBrains Mono",monospace;background:var(--accs);color:var(--acc);padding:1px 6px;border-radius:5px}
+.q{background:var(--warns);border:1px solid var(--line);border-radius:10px;padding:10px 14px;margin:8px 0}
+ul{margin:4px 0;padding-left:20px}
+</style>
+</head>
+<body><div class="w">
+<h1>SourceLens 治理地图</h1>
+<p class="sub">v0.6 · 治理设计第 1 步 · 纯设计稿，未改动仓库代码 · 以下决策均按「推荐方案」暂定，待你逐条确认</p>
+<nav class="tabs"><a href="#d">已暂定的决策</a><a href="#r">角色</a><a href="#o">资产归属</a><a href="#m">权限矩阵</a><a href="#a">超管职责与代管</a><a href="#c">资源目录与环境变量</a><a href="#z">三区划分</a><a href="#p">页面归位</a><a href="#n">导航</a><a href="#l">租户生命周期</a><a href="#e">边界场景</a></nav>
+
+<h2 id="d">0 · 已暂定的决策</h2>
+<div class="q"><b>核心原则（v0.4）</b>：<b>默认完全隔离</b>——每个资源只属于一个租户（模型 Key、助手、知识库、成员等），不跨租户共享。<b>唯一例外是 LensNode：支持「私有节点」和「共享节点」两种</b>。共享节点归超级管理员管辖，由超管设置对哪些租户可见（白名单 / 黑名单二选一）。超管是「平台租户」，自己的资源与别的租户规则相同。其他资源以后若要共享，走「所有者租户显式授权」。</div>
+<div class="card"><table>
+<tr><th>#</th><th>问题</th><th>暂定</th></tr>
+<tr><td>1</td><td>用户是否多租户</td><td>数据模型支持多租户成员；界面第一版单租户，仅超管有租户切换器</td></tr>
+<tr><td>2</td><td>模型来源</td><td>租户自有：每个租户配置自己的模型 Key；不提供平台全局模型</td></tr>
+<tr><td>3</td><td>通知渠道</td><td>平台提供默认渠道；租户可配置自己的飞书等渠道</td></tr>
+<tr><td>4</td><td>租户内角色</td><td>租户管理员（管理租户内一切）/ 成员；暂不设「资源管理员」，后续按需再拆</td></tr>
+<tr><td>5</td><td>超管看租户数据</td><td>默认不可；须点「进入租户」，进入期间顶部常驻红色提示条，全程审计</td></tr>
+<tr><td>6</td><td>节点</td><td><b>两种并存</b>：①私有节点——租户自己注册、自己运维；②共享节点——超管注册与运维，按可见范围（全部租户 + 黑名单，或仅指定租户 = 白名单）开放给租户使用</td></tr>
+</table></div>
+
+<h2 id="r">1 · 角色</h2>
+<div class="g3">
+<div class="card"><b>超级管理员</b><p>属于「平台租户」（一个特殊租户）。创建 / 分配 / 停用租户，管理基础设施与全局策略。</p><span class="t pp">平台控制台</span></div>
+<div class="card"><b>租户管理员</b><p>管理自己租户的助手、数据资产、成员、节点、审核与用量。</p><span class="t y">租户管理</span> <span class="t a">工作台</span></div>
+<div class="card"><b>普通用户</b><p>只看到助手：对话、历史、分享、公开问答。不出现任何运维概念。</p><span class="t a">工作台</span></div>
+</div>
+<p class="sub">暂不设「资源管理员」：租户管理员管理租户内的一切。后续如需拆分，可从租户管理员中分出只管数据资产的角色。</p>
+
+<h2 id="o">2 · 资产归属</h2>
+<div class="card"><table>
+<tr><th>资产</th><th>归属</th><th>说明</th></tr>
+<tr><td>助手、知识库、连接、Skill、MCP</td><td><span class="t y">租户私有</span></td><td>租户管理员创建与同步；互相不可见</td></tr>
+<tr><td>模型 Key</td><td><span class="t y">租户自有</span></td><td>租户自己配置；其他租户与平台层均不可见</td></tr>
+<tr><td>私有节点</td><td><span class="t y">租户自有</span></td><td>租户自己注册与运维；平台层不可见</td></tr>
+<tr><td>共享节点</td><td><span class="t pp">平台共享</span></td><td>超管注册与运维；超管设置可见范围；租户只能使用（绑定到自己的助手），不能编辑 / 删除</td></tr>
+<tr><td>分享、Run、评估、告警订阅</td><td><span class="t y">租户私有</span></td><td>审核权在租户管理员</td></tr>
+<tr><td>成员、组、角色</td><td><span class="t y">租户私有</span></td><td>邀请 / 加组 / 停用均在租户内</td></tr>
+<tr><td>官方助手 / Skill / MCP 模板</td><td><span class="t pp">平台发布</span></td><td>租户在市场「安装」＝复制一份到本租户，之后互不影响</td></tr>
+<tr><td>任务调度、全局配置、审计</td><td><span class="t pp">平台</span></td><td>租户只读本租户相关任务结果</td></tr>
+<tr><td>通知渠道</td><td><span class="t l">两级</span></td><td>平台默认 + 租户自有；租户自有优先</td></tr>
+</table></div>
+
+<h2 id="m">3 · 权限矩阵（角色 × 资源 × 动作）</h2>
+<p>V=查看　C=创建　E=编辑　D=删除　A=审批 / 发布　— 无权限。</p>
+<div class="card"><table>
+<tr><th>资源</th><th>普通用户</th><th>租户管理员</th><th>超管（平台）</th><th>超管（进入租户后）</th></tr>
+<tr><td>对话 / 历史 / 我的分享</td><td>V C E D（自己的）</td><td>同左</td><td>同左</td><td>同左</td></tr>
+<tr><td>助手</td><td>V（有权限的）</td><td>V C E D</td><td>— 仅看数量</td><td>V C E D</td></tr>
+<tr><td>知识库 / 连接 / 同步</td><td>—</td><td>V C E D</td><td>—</td><td>V C E D</td></tr>
+<tr><td>Skill / MCP 安装</td><td>—</td><td>V C E D</td><td>发布模板</td><td>V C E D</td></tr>
+<tr><td>成员 / 组 / 角色</td><td>—</td><td>V C E D</td><td>— 仅看数量</td><td>V C E D</td></tr>
+<tr><td>私有节点</td><td>—</td><td>V C E D</td><td>— 不可见</td><td>V C E D</td></tr>
+<tr><td>共享节点</td><td>—</td><td>V（被授权的，只读 + 绑定助手）</td><td>V C E D，设置可见范围</td><td>V（被授权的）</td></tr>
+<tr><td>QA 榜单审核</td><td>—</td><td>A</td><td>—</td><td>A</td></tr>
+<tr><td>问答历史 / 评估</td><td>—</td><td>V C E</td><td>—</td><td>V C E</td></tr>
+<tr><td>本租户用量</td><td>—</td><td>V</td><td>V（汇总 + 分租户）</td><td>V</td></tr>
+<tr><td>租户（创建 / 额度 / 停用）</td><td>—</td><td>V 自己的额度</td><td>V C E D</td><td>—</td></tr>
+<tr><td>模型 Key</td><td>—</td><td>V C E D</td><td>— 不可见</td><td>V C E D</td></tr>
+<tr><td>任务调度 / 通知基础设施 / 全局配置</td><td>—</td><td>—</td><td>V C E D</td><td>—</td></tr>
+<tr><td>审计日志</td><td>—</td><td>V（本租户）</td><td>V（全部）</td><td>V</td></tr>
+</table></div>
+
+<h2 id="a">3.4 · 超级管理员的职责边界与「代管」（v0.6 新增）</h2>
+<div class="g2">
+<div class="card"><b>超管关心 / 要控制的</b><ul>
+<li><b>全局与租户级统计</b>：租户数、活跃度、提问量、模型用量（只看汇总）</li>
+<li><b>节点与全局配置</b>：共享节点及其可见范围、全局配置、任务调度</li>
+<li><b>官方目录</b>：上传 / 发布技能、MCP、连接器</li>
+<li><b>模型</b>：只看统计；另留「平台模型配置」，仅供平台自身功能使用</li>
+<li><b>告警与通知</b>：平台自己的订阅、渠道、记录（自己通知自己）</li>
+<li><b>租户</b>：创建 / 停用租户，以及「代管」</li>
+</ul></div>
+<div class="card"><b>超管不关心 / 不参与的</b><ul>
+<li>助手的创建流程、Run 的运行状态（平台视角不出现）</li>
+<li>租户的<b>用户、用户组、角色与权限</b>：由租户自己控制，<b>代管模式下也不可见</b></li>
+<li>租户的对话内容、环境变量值、私有节点</li>
+</ul></div>
+</div>
+<div class="q"><b>代管</b>：超管可以「进入租户」，帮它建立模型与各类配置（模型、节点、知识库、助手、技能 / MCP / 连接的启用与环境变量等），进入后顶部显示红色代管提示条，全程审计；但成员、用户组、角色三类页面在代管模式下不可见。租户创建向导里可以选「由我代管配置」或「交给租户管理员自己配置」。</div>
+<h2 id="c">3.5 · 资源目录与环境变量（v0.5 新增）</h2>
+<p>代码现状（已核对）：<code>Skill</code>、<code>MCPServer</code> 都是「全局资源」，没有租户字段；<code>EnvironmentVariableSet</code> 是加密的、名称全局唯一的变量集，只有管理员（staff）能增删改，并有「显示明文」接口；助手通过 <code>AssistantSkill / AssistantMCP</code> 的 <code>environment_variable_set</code> 把变量集绑定到具体技能 / MCP；技能 / MCP 自己声明需要哪些变量（<code>definition.environment</code> / <code>environment</code>）。多租户化时这三处都要加租户归属。</p>
+<div class="card"><table>
+<tr><th>资源</th><th>谁发布 / 维护</th><th>租户能做什么</th><th>与租户自有内容的关系</th></tr>
+<tr><td><b>官方技能 / MCP</b></td><td>超管（平台「官方目录」）</td><td>启用即直接使用（引用，不复制）；自动跟随更新；重大变更需租户确认；环境变量不在启用时填，而是配置助手时按助手绑定变量集</td><td>租户侧分「平台官方」「我的」两个标签，严格分开</td></tr>
+<tr><td><b>租户自有技能 / MCP</b></td><td>租户管理员（上传 / 接入）</td><td>完全自主，仅本租户可见</td><td>放在「我的」，与官方互不混合</td></tr>
+<tr><td><b>连接器</b></td><td>超管（官方发布，含允许访问范围）</td><td>选择官方连接器 + 填写自己的凭证；<b>不能上传自建连接器</b></td><td>没有「我的连接器」</td></tr>
+</table></div>
+<h3>环境变量分三层</h3>
+<div class="card"><table>
+<tr><th>层</th><th>内容</th><th>谁维护</th><th>谁能看值</th></tr>
+<tr><td>① 声明</td><td>这个能力需要哪些变量（名称、说明）</td><td>发布者：官方内容归超管，自建内容归租户</td><td>—（只是名字）</td></tr>
+<tr><td>② 平台托管值（可选）</td><td>平台统一提供的凭证，如平台统一采购的搜索服务</td><td>超管</td><td>只有超管；租户只看到「平台托管」，不能查看、不能覆盖</td></tr>
+<tr><td>③ 租户自己的值</td><td>租户自己的 Token、地址、账号（现在的 EnvironmentVariableSet）</td><td><b>租户管理员</b>（租户侧「环境变量」页；也可在配置助手时直接选择 / 新增）</td><td>仅本租户管理员（显示明文要记审计）；<b>超管也看不到</b></td></tr>
+</table></div>
+<div class="q"><b>结论</b>：环境变量「声明」和「平台托管值」由超管维护；<b>租户自己的凭证值必须由租户自己维护</b>，不应该交给超管——否则平台就持有了所有租户的密钥，违背隔离原则，也是安全风险。租户在配置助手时配置自己的技能与环境变量，与你的想法一致。</div>
+<h2 id="z">4 · 三区划分原则</h2>
+<div class="g3">
+<div class="card zone"><b>① 工作台</b><p>所有人。DeepSeek 式极简：会话列表 + 居中阅读 + 输入框。沿用四种风格（经典 / 暖纸 / 极简 / 紧凑）。</p></div>
+<div class="card zone z2"><b>② 租户管理</b><p>租户管理员。嵌在用户侧，参考图 2 的「空间 / 组织」与图 3 的市场：概览 → 助手 → 数据资产 → 市场 → 成员 → 节点 → 审核 → 用量。卡片、搜索、已安装、一键添加。</p></div>
+<div class="card zone z3"><b>③ 平台控制台</b><p>仅超管。与其他区域同风格、明亮不压抑：租户、共享节点、汇总用量、任务、通知底座、全局配置、审计。更密、更偏表格。</p></div>
+</div>
+<div class="q"><b>判断口诀</b>：只影响单个租户、有业务语义 → ②；跨租户、涉及基础设施、风险高 → ③。</div>
+
+<h2 id="p">5 · 现有 40 页归位</h2>
+<div class="card"><table>
+<tr><th>现有页</th><th>归入</th><th>改动</th></tr>
+<tr><td>登录 / 重置密码 / 404</td><td>公共</td><td>登录增加「租户已停用」「账号未加入任何租户」两种状态</td></tr>
+<tr><td>首页 / 聊天 / 历史 / 我的分享 / 设置 / 公开问答列表与详情</td><td>① 工作台</td><td>基本不变；首页对租户管理员加「去管理」提示</td></tr>
+<tr><td>助手（列表 / 向导 / 换模型）</td><td>② 租户管理</td><td>卡片化 + 「从市场安装模板」入口</td></tr>
+<tr><td>知识库 / 连接 / 资源设置</td><td>② 租户管理 · 数据资产</td><td>合并为一个「数据资产」区：源、连接、同步状态同屏</td></tr>
+<tr><td>Skill / MCP</td><td>② 租户管理 · 市场</td><td>改为插件式：已安装 / 热门 / 搜索 / 一键添加；平台模板与自建分开</td></tr>
+<tr><td>用户 / 用户组 / 角色</td><td>② 租户管理 · 成员</td><td>租户内只有两种角色：租户管理员、普通用户；角色页改为只读的「角色说明」</td></tr>
+<tr><td>节点</td><td>② 租户管理 + ③ 平台控制台</td><td>租户侧：私有节点（可管）+ 被授权的共享节点（只读，带「共享」标记）；平台侧：新增「共享节点」页，管理共享节点及其可见范围</td></tr>
+<tr><td>QA 榜单审核 / 问答历史 / 评估 ×3 / 告警 ×3</td><td>② 租户管理</td><td>作用域固定为本租户</td></tr>
+<tr><td>LLM 使用统计 / 明细</td><td>② 租户用量 + ③ 平台用量</td><td>同一组件，两个作用域；平台版只看各租户汇总数量与费用，不看内容</td></tr>
+<tr><td>LLM 模型配置 / 定时任务、任务 ×3、通知渠道 / 设置 / 统计 / 明细、Lens 全局配置</td><td>③ 平台控制台</td><td>模型配置、通知渠道下沉到租户侧；平台只留任务调度、通知底座、全局配置</td></tr>
+<tr><td><b>新增</b>：租户列表、创建租户向导、租户详情（额度 / 成员数 / 状态）、审计日志、进入租户</td><td>③ 平台控制台</td><td>新页面</td></tr>
+<tr><td><b>新增</b>：管理概览（待办 / 额度 / 同步异常 / 节点状态 / 新手引导）、市场、额度与用量（租户侧）</td><td>② 租户管理</td><td>新页面</td></tr>
+</table></div>
+
+<h2 id="n">6 · 导航（按角色）</h2>
+<div class="g3">
+<div class="card"><b>普通用户</b><p>窄图标轨：<br>对话<br>（二级栏即会话列表与助手选择）</p></div>
+<div class="card"><b>租户管理员</b><p>图标轨：<br>对话　<span class="t y">管理</span><br>管理二级栏：概览 · 助手 · 数据资产 · 市场 · 成员与组 · 节点 · 审核 · 用量 · 设置</p></div>
+<div class="card"><b>超级管理员</b><p>图标轨：<br>对话　管理　<span class="t pp">平台</span><br>顶部：租户切换器（默认「平台租户」）<br>平台二级栏：租户 · <b>共享节点</b> · 汇总用量 · 任务 · 通知底座 · 全局配置 · 审计</p></div>
+</div>
+<p>手机端：图标轨折叠进汉堡抽屉，二级栏作为第二层。</p>
+
+<h2 id="l">7 · 租户生命周期</h2>
+<div class="card"><p><span class="t a">创建（超管向导）</span> → <span class="t l">待激活（已邀请管理员，未登录）</span> → <span class="t y">正常</span> → <span class="t l">额度告急 / 超额</span> → <span class="t n">已停用（只读 / 禁登录）</span> → <span class="t z">已归档（保留期后删除）</span></p>
+<p>创建向导 5 步：基本信息 → 额度（成员数、助手数、存储）→ 初始管理员 → 初始配置（可由超管代配模型与节点，或交给管理员上手引导）→ 确认。</p></div>
+
+<h2 id="e">8 · 治理新增的边界场景（将在原型中逐一实现）</h2>
+<div class="g2">
+<div class="card"><b>租户侧</b><ul>
+<li>新租户全空：引导三步（连知识库 → 建助手 → 邀成员）</li>
+<li>额度用完 / 80% 预警 / 模型被平台下线</li>
+<li>新租户尚无私有节点、也未被授权共享节点：助手不可用，引导去注册节点或联系超管</li>
+<li>共享节点：从白名单移除租户 / 加入黑名单时，预览受影响的助手并给出过渡期；节点下线对多租户的级联影响</li>
+<li>同一共享节点上多租户并发：可选的每租户并发上限；各租户 Run 与工作区在节点上互相隔离</li>
+<li>节点全部离线 / 模型 Key 失效：助手提示与管理员告警</li>
+<li>管理员被降级后正在编辑的页面 → 即时无权限</li>
+<li>最后一个管理员不可被移除 / 降级</li>
+<li>市场模板版本更新，已安装副本提示可升级</li>
+<li>成员 0 / 3 / 上千；助手 0 / 3 / 上百</li>
+</ul></div>
+<div class="card"><b>平台侧</b><ul>
+<li>租户 0 / 3 / 上百，状态筛选与分页</li>
+<li>停用租户时的影响面确认（成员数、运行中 Run、分享链接）</li>
+<li>进入租户：顶部红条、仅限时、审计留痕、退出</li>
+<li>租户名 / 域名冲突；初始管理员邮箱已存在于其他租户</li>
+<li>汇总用量：只展示各租户数量与费用，点击不进入内容</li>
+</ul></div>
+</div>
+<p class="sub" style="margin-top:24px">下一步：确认本页后，做第 2 步——三种角色的壳（图标轨 + 二级栏 + 角色切换）。</p>
+</div></body></html>
