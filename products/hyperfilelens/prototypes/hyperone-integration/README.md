@@ -42,8 +42,26 @@ HyperFileLens, HyperBDR and HyperCDR under one product workspace.
   layout. Healthy connection badges are hidden; simulated unavailable statistics
   and unconnected capabilities have distinct explanations.
 
-Source snapshot: `oneprolabs/hyperfilelens` commit `f1f56ec204196018da7231f0844ba2efed7bb3bd`
-(`Align HyperOne overview drilldowns and filters`). Only prebuilt, directory-local static
+## Protection workspace update
+
+- Unified protection navigation groups file backup/restore, host DR, host failback,
+  container protection and shared resource catalogs in one persistent sidebar.
+- File protection reuses shared stage-card styles; host DR and failback retain
+  their product-specific step visuals and fullscreen configuration structure.
+- Container application protection provides selection, configuration and execution
+  stages, with overview coverage scopes preserved and resettable.
+- Host details use product-specific information, storage, network and monitoring
+  tabs. Lists share compact inline filters and a single reset action.
+- Native workflow reconstruction remains partial: provider inventories are local
+  fixtures, DR configuration covers bounded OpenStack block/object cases, and
+  several original disk/NIC editors and recovery dialogs are not reconstructed.
+  A successful local task is not proof of production recovery or validation.
+- The manually-complete-failback action is removed; local clicks cannot create
+  completed synchronization or verification evidence.
+
+Source snapshot: `oneprolabs/hyperfilelens` commit `da6c0a57425e0749ca774df2e4c40f98901f9abd`
+(`Restore native HyperOne protection workspaces`), including `43772683`
+(`Extract shared backup workflow step styles`). Only prebuilt, directory-local static
 assets are published here; no source build tooling or dependencies are added.
 
 All data and operations are local fictional samples. The prototype does not
