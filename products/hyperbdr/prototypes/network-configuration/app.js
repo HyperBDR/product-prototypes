@@ -1371,6 +1371,14 @@ document.addEventListener(
   true
 );
 document.addEventListener("click", event => {
+  const help = event.target.closest("[data-purpose-help]");
+  if (help) {
+    const purpose = help.dataset.purposeHelp;
+    if (activePurposeHelp === purpose && purposeHelpPinned) closePurposeHelp();
+    else showPurposeHelp(purpose, true);
+    return;
+  }
+  if (!event.target.closest("[data-purpose-help-item]")) closePurposeHelp();
   if (event.target.closest("[data-navigation]")) event.preventDefault();
   if (event.target.matches("[data-dismiss-drawer]")) {
     closeOverlay();
@@ -1569,6 +1577,11 @@ document.addEventListener("click", event => {
   if (action === "close") closeOverlay();
 });
 document.addEventListener("keydown", event => {
+  if (event.key === "Escape" && activePurposeHelp) {
+    event.preventDefault();
+    closePurposeHelp();
+    return;
+  }
   const languageMenu = document.getElementById("language-menu");
   if (event.key === "Escape" && languageMenu && !languageMenu.hidden) {
     event.preventDefault();
@@ -1924,7 +1937,56 @@ function bindNetworkState() {
   saved = savedNetworkPlans[activeScene][key] || clone(state);
   expanded = expandedViews[activeScene][activePurpose];
 }
+// Independent help triggers remain usable even when their network tab is disabled.
+let activePurposeHelp = null;
+let purposeHelpPinned = false;
+let purposeHelpHideTimer;
+function closePurposeHelp() {
+  clearTimeout(purposeHelpHideTimer);
+  if (activePurposeHelp) {
+    document.getElementById("purpose-tooltip-" + activePurposeHelp).hidden = true;
+    document.getElementById("purpose-help-" + activePurposeHelp)
+      .setAttribute("aria-expanded", "false");
+  }
+  activePurposeHelp = null;
+  purposeHelpPinned = false;
+}
+function showPurposeHelp(purpose, pinned = false) {
+  if (!["drill", "takeover"].includes(purpose)) return;
+  if (activePurposeHelp !== purpose) closePurposeHelp();
+  clearTimeout(purposeHelpHideTimer);
+  activePurposeHelp = purpose;
+  purposeHelpPinned = purposeHelpPinned || pinned;
+  document.getElementById("purpose-tooltip-" + purpose).hidden = false;
+  document.getElementById("purpose-help-" + purpose)
+    .setAttribute("aria-expanded", "true");
+}
+document.addEventListener("mouseover", event => {
+  const help = event.target.closest("[data-purpose-help]");
+  if (help) showPurposeHelp(help.dataset.purposeHelp);
+  const item = event.target.closest("[data-purpose-help-item]");
+  if (item?.dataset.purposeHelpItem === activePurposeHelp)
+    clearTimeout(purposeHelpHideTimer);
+});
+document.addEventListener("mouseout", event => {
+  const item = event.target.closest("[data-purpose-help-item]");
+  if (!item || item.dataset.purposeHelpItem !== activePurposeHelp ||
+      item.contains(event.relatedTarget) || purposeHelpPinned ||
+      item.contains(document.activeElement)) return;
+  // Allow crossing the arrow gap to read/hover the tooltip without dismissing it.
+  purposeHelpHideTimer = setTimeout(closePurposeHelp, 150);
+});
+document.addEventListener("focusin", event => {
+  const help = event.target.closest("[data-purpose-help]");
+  if (help) showPurposeHelp(help.dataset.purposeHelp);
+});
+document.addEventListener("focusout", event => {
+  const item = event.target.closest("[data-purpose-help-item]");
+  if (item?.dataset.purposeHelpItem === activePurposeHelp &&
+      !item.contains(event.relatedTarget)) closePurposeHelp();
+});
 function dismissNetworkOverlays() {
+  closePurposeHelp();
   closeSelectMenus();
   overlay = null;
   draft = null;
