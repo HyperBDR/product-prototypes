@@ -71,8 +71,19 @@ HyperFileLens, HyperBDR and HyperCDR under one product workspace.
 - Page copy removes repeated headings and explanatory boilerplate while keeping
   disabled-action reasons and data/evidence boundaries accessible.
 
-Source snapshot: `oneprolabs/hyperfilelens` commit `11e59b8091bf2d408406d8d32d539171a8de2fe7`
-(`Unify HyperOne management details and lists`). Only prebuilt, directory-local static
+## Capability navigation comparison
+
+- The header comparison selector switches between showing all protection
+  capabilities and a focused capability dropdown with a matching sidebar.
+- Focused mode retains the last visited protection page for each capability
+  during the session; resource catalogs remain shared.
+- The comparison mode is preserved in links and browser history using
+  `protectionNav=capability`. Omit that parameter for the default all-capability
+  navigation. The capability selector remains directly accessible on mobile.
+- Operations overview uses the same sidebar entry styling as other overviews.
+
+Source snapshot: `oneprolabs/hyperfilelens` commit `d61ded186d4c8b24d6665502599ce6f6b7117086`
+(`Add HyperOne capability navigation comparison`). Only prebuilt, directory-local static
 assets are published here; no source build tooling or dependencies are added.
 
 All data and operations are local fictional samples. The prototype does not
