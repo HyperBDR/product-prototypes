@@ -82,8 +82,25 @@ HyperFileLens, HyperBDR and HyperCDR under one product workspace.
   navigation. The capability selector remains directly accessible on mobile.
 - Operations overview uses the same sidebar entry styling as other overviews.
 
-Source snapshot: `oneprolabs/hyperfilelens` commit `d61ded186d4c8b24d6665502599ce6f6b7117086`
-(`Add HyperOne capability navigation comparison`). Only prebuilt, directory-local static
+## Backup workflow and language update
+
+- Browse Backup Data opens a dedicated source/snapshot page and snapshot detail
+  drawer. Returning preserves the execution-list selection and filters. The local
+  preview has no repository file manifests or downloads; unknown metrics stay
+  unavailable and fixture snapshots remain explicitly labeled.
+- Source task history lives in the source detail Tasks tab, with search, filters,
+  refresh, pagination and the existing nested task detail drawer.
+- File backup configuration follows the native five-step structure with directory
+  selection, policies/filters/compression, repository assignment, optional restore
+  plans and review. All directory, policy and repository choices remain samples.
+- The header language dropdown, concise sidebar labels and consistent English
+  Title Case preserve locale in the URL without loading account preferences.
+- Header, sidebar and main content have independent viewport-contained scrolling.
+- Cancel closes local editors without saving; navigating away still guards an
+  unfinished workflow. These are mock workflows, not production integrations.
+
+Source snapshot: `oneprolabs/hyperfilelens` commit `f042e53ed0a78599225453b6fc0c27360f9b8f35`
+(`Refine HyperOne backup workflows and navigation`). Only prebuilt, directory-local static
 assets are published here; no source build tooling or dependencies are added.
 
 All data and operations are local fictional samples. The prototype does not
