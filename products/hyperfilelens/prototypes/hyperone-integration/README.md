@@ -59,9 +59,20 @@ HyperFileLens, HyperBDR and HyperCDR under one product workspace.
 - The manually-complete-failback action is removed; local clicks cannot create
   completed synchronization or verification evidence.
 
-Source snapshot: `oneprolabs/hyperfilelens` commit `da6c0a57425e0749ca774df2e4c40f98901f9abd`
-(`Restore native HyperOne protection workspaces`), including `43772683`
-(`Extract shared backup workflow step styles`). Only prebuilt, directory-local static
+## Management and detail update
+
+- Resource, task, runtime-event, audit and log records use dedicated detail panels
+  with consistent layered drawers and contextual navigation.
+- Shared fullscreen editors and confirmation dialogs unify local create/edit
+  interactions without implying a connected production service.
+- Lists share pagination, compact filters and capability counts; monitoring adds
+  local sample charts, while container applications retain dedicated detail and
+  recovery-point views.
+- Page copy removes repeated headings and explanatory boilerplate while keeping
+  disabled-action reasons and data/evidence boundaries accessible.
+
+Source snapshot: `oneprolabs/hyperfilelens` commit `11e59b8091bf2d408406d8d32d539171a8de2fe7`
+(`Unify HyperOne management details and lists`). Only prebuilt, directory-local static
 assets are published here; no source build tooling or dependencies are added.
 
 All data and operations are local fictional samples. The prototype does not
