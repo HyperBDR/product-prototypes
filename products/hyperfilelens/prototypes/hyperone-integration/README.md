@@ -99,8 +99,18 @@ HyperFileLens, HyperBDR and HyperCDR under one product workspace.
 - Cancel closes local editors without saving; navigating away still guards an
   unfinished workflow. These are mock workflows, not production integrations.
 
-Source snapshot: `oneprolabs/hyperfilelens` commit `f042e53ed0a78599225453b6fc0c27360f9b8f35`
-(`Refine HyperOne backup workflows and navigation`). Only prebuilt, directory-local static
+## Capability workspace and enrollment isolation
+
+- Scoped capability navigation is the default, with grouped host DR storage and
+  recovery-platform entries and fixed resource-type views.
+- File protection keeps its Proxy management entry inside the selected workspace.
+- Node installation previews use a prototype-only wizard with local demo commands;
+  no enrollment or token service is called. The production installation wizard is
+  restored to its pre-prototype behavior.
+- This update publishes HTML, JavaScript and CSS only; no images are added or changed.
+
+Source snapshot: `oneprolabs/hyperfilelens` commit `25afc034b4bb52e84e2280534324123360dbd353`
+(`Refine HyperOne capability workspaces`). Only prebuilt, directory-local static
 assets are published here; no source build tooling or dependencies are added.
 
 All data and operations are local fictional samples. The prototype does not
