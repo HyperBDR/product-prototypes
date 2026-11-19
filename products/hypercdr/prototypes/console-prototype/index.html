@@ -1,0 +1,42 @@
+<!doctype html><html lang="zh-CN"><head><meta charset="utf-8"><meta name="viewport" content="width=device-width,initial-scale=1"><title>HyperCDR 原型预览</title>
+<link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=IBM+Plex+Mono:wght@400;500;600&family=IBM+Plex+Sans:wght@400;500;600&family=Noto+Sans+SC:wght@400;500;700&display=swap">
+<link rel="stylesheet" href="style.css">
+<style>
+body{display:flex;flex-direction:column;height:100%;overflow:hidden}
+#ctl{flex:none;background:var(--surface);border-bottom:1px dashed var(--border-str);padding:8px 14px;display:flex;flex-wrap:wrap;gap:6px 18px;align-items:center;font-size:12px;max-height:38vh;overflow:auto}
+#ctl .cc{border:1px solid var(--border-str);background:var(--surface);border-radius:999px;padding:2px 11px;min-height:26px;font-size:12px}#ctl .cc.on{background:var(--accent);color:#fff;border-color:var(--accent)}#ctl .g{display:flex;gap:4px;align-items:center;flex-wrap:wrap}#ctl .gl{color:var(--text-3);margin-right:2px}
+#stage{flex:1;min-height:0;display:flex;gap:28px;padding:16px 20px;overflow:auto;align-items:flex-start;justify-content:center;background:var(--sunken)}
+.pc{flex:1 1 0;min-width:0;max-width:1480px;height:100%;min-height:560px;display:flex;flex-direction:column}
+.cap{font-size:11px;color:var(--text-3);margin:0 0 6px 4px}
+.pc iframe{flex:1;width:100%;border:1px solid var(--border-str);border-radius:10px;background:var(--bg);box-shadow:var(--shadow-pop)}
+.phone{flex:none;width:412px;padding:11px;background:#0c0c0e;border-radius:48px;box-shadow:var(--shadow-pop);position:relative}
+.phone:before{content:'';position:absolute;top:18px;left:50%;transform:translateX(-50%);width:96px;height:22px;border-radius:12px;background:#0c0c0e;z-index:2}
+.phone iframe{display:block;width:390px;height:810px;border:0;border-radius:38px;background:var(--bg)}
+</style></head><body>
+<div id="ctl"></div><div id="stage"></div>
+<script src="core.js"></script>
+<script>
+const MK='hcdr.proto.mode';let mode='both';try{mode=localStorage.getItem(MK)||'both'}catch(e){}
+const g=(label,opts)=>`<div class="g"><span class="gl">${label}</span>${opts.map(o=>`<button class="cc ${o[2]?'on':''}" data-k="${o[0]}">${o[1]}</button>`).join('')}</div>`;
+const AUTHS=[['login','登录'],['wrong','密码错误'],['captcha','需验证码'],['locked','账户锁定'],['expired','会话过期'],['forgot','忘记密码'],['signup','注册'],['signupOff','注册已关闭'],['verifySent','待验证邮件'],['verify','验证后设置'],['invite','接受邀请']];
+function ctl(){const S=H.get();let h='<b style="color:var(--text-3)">设计切换器</b>';
+h+=g('展示',[['mode:both','桌面 + 手机',mode==='both'],['mode:pc','仅桌面',mode==='pc'],['mode:phone','仅手机',mode==='phone']]);
+h+=g('页面',[['screen:landing','宣传页',S.screen==='landing'],['screen:auth','登录 / 注册',S.screen==='auth'],['screen:app','控制台',S.screen==='app']]);
+if(S.screen==='auth')h+=g('认证状态',AUTHS.map(a=>['auth:'+a[0],a[1],(a[0]==='wrong'?S.auth==='login'&&S.authErr:a[0]==='signupOff'?S.auth==='signup'&&S.signupOff:S.auth===a[0]&&!(a[0]==='login'&&S.authErr)&&!(a[0]==='signup'&&S.signupOff))]));
+h+=g('主题',[['theme:light','浅色',S.theme==='light'],['theme:dark','深色',S.theme==='dark']]);
+h+=g('角色',[['role:orgadmin','组织管理员',S.role==='orgadmin'],['role:member','成员',S.role==='member'],['role:platform','平台管理员',S.role==='platform']]);
+h+=g('场景',[['scene:normal','默认（设计稿）',S.scene==='normal'],['scene:healthy','全部健康',S.scene==='healthy'],['scene:empty','新组织（未注册集群）',S.scene==='empty'],['scene:agentOffline','集群离线',S.scene==='agentOffline'],['scene:storageDown','存储不可达',S.scene==='storageDown']]);
+h+=g('语言',[['lang:zh','中文',S.lang==='zh'],['lang:en','EN',S.lang==='en']]);
+h+=g('数据',[['reset','重置当前场景',false]]);
+document.getElementById('ctl').innerHTML=h;
+const st=document.getElementById('stage'),want=mode;if(st.dataset.m!==want){st.dataset.m=want;st.innerHTML=(want!=='phone'?`<div class="pc"><div class="cap">桌面 · 自适应宽度</div><iframe src="app.html?f=pc" title="desktop"></iframe></div>`:'')+(want!=='pc'?`<div><div class="cap" style="text-align:center">手机 · 390×810（≤820px 自动切换为手机版式）</div><div class="phone"><iframe src="app.html?f=phone" title="phone"></iframe></div></div>`:'')}}
+document.addEventListener('click',e=>{const b=e.target.closest('[data-k]');if(!b)return;const [k,v]=b.dataset.k.split(':');
+if(k==='mode'){mode=v;try{localStorage.setItem(MK,v)}catch(x){}ctl();return}
+if(k==='reset'){H.reset();return}
+if(k==='scene'){H.reset(v);return}
+if(k==='screen'){H.set({screen:v,umenu:false,drawer:null});return}
+if(k==='auth'){const p={screen:'auth',authErr:'',signupOff:false,fails:0,auth:v};if(v==='wrong'){p.auth='login';p.authErr='邮箱或密码不正确。再失败 2 次将要求验证码。';p.fails=1}if(v==='signupOff'){p.auth='signup';p.signupOff=true}if(v==='locked'){p.authErr='账户已锁定'}H.set(p);return}
+if(k==='role'){H.set({role:v,nav:'dashboard',sub:'',drawer:null});return}
+H.set({[k]:v})});
+H.sub(ctl);ctl();
+</script></body></html>

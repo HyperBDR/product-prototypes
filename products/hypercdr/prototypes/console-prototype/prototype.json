@@ -1,0 +1,7 @@
+{
+  "id": "console-prototype",
+  "name": "HyperCDR 交互原型",
+  "description": "在桌面与手机预览中体验 HyperCDR 的登录、控制台、应用容灾、备份向导和恢复流程。",
+  "status": "draft",
+  "tags": ["disaster recovery", "backup", "restore", "responsive"]
+}
