@@ -2,7 +2,7 @@
 
 const LANGUAGE_STORAGE_KEY = "hyperbdr-network-language-v1";
 const SUPPORTED_LANGUAGES = ["zh", "en"];
-let currentLanguage = "zh";
+let currentLanguage = "en";
 try {
   const storedLanguage = localStorage.getItem(LANGUAGE_STORAGE_KEY);
   if (SUPPORTED_LANGUAGES.includes(storedLanguage))
@@ -13,7 +13,7 @@ try {
 
 function t(key, parameters = {}) {
   const message =
-    UI_MESSAGES[currentLanguage][key] ?? UI_MESSAGES.zh[key] ?? key;
+    UI_MESSAGES[currentLanguage][key] ?? UI_MESSAGES.en[key] ?? UI_MESSAGES.zh[key] ?? key;
   return message.replace(/\{(\w+)\}/g, (match, name) =>
     Object.prototype.hasOwnProperty.call(parameters, name)
       ? String(parameters[name])

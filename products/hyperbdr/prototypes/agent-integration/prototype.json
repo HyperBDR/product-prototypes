@@ -1,0 +1,18 @@
+{
+  "id": "agent-integration",
+  "name": "HyperBDR 智能体集成",
+  "description": "HyperBDR 智能体集成页面原型，包含 HyperBDR skills 安装说明和 CLI Access Token 管理。",
+  "status": "draft",
+  "owner": "",
+  "tags": [
+    "agent",
+    "skills",
+    "cli-token",
+    "settings",
+    "hyperbdr"
+  ],
+  "entry": "index.html",
+  "thumbnail": "preview.png",
+  "visible": true,
+  "order": 50
+}

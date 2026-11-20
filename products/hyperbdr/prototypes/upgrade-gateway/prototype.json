@@ -1,0 +1,17 @@
+{
+  "id": "upgrade-gateway",
+  "name": "HyperBDR 云同步网关升级管理",
+  "description": "基于 newmuse 源样式复刻云同步网关升级管理，包含容灾/回切、八种状态、批量升级、取消、升级记录和任务详情。",
+  "status": "draft",
+  "owner": "",
+  "tags": [
+    "upgrade",
+    "gateway",
+    "operations",
+    "hyperbdr"
+  ],
+  "entry": "index.html",
+  "thumbnail": "preview-list.png",
+  "visible": true,
+  "order": 40
+}
