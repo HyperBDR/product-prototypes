@@ -1,7 +1,6 @@
 {
-  "id": "business-continuity-platform-v6",
+  "id": "business-continuity-platform",
   "name": "HyperBCP 业务连续性保障平台",
   "description": "当前 HyperBCP 工程的同源完整静态导出；保留六大模块、编排画布、弹窗、抽屉、本地数据与中英文交互。包含内联应用运行时。",
-  "status": "draft",
-  "updatedAt": "2026-11-20"
+  "status": "draft"
 }
