@@ -1,0 +1,60 @@
+<svg xmlns="http://www.w3.org/2000/svg" width="960" height="540" viewBox="0 0 960 540" role="img" aria-labelledby="title desc">
+  <title id="title">AWS Marketplace SaaS subscription onboarding</title>
+  <desc id="desc">A dark blue HyperBDR onboarding prototype with a three-step subscription, entitlement and account flow.</desc>
+  <defs>
+    <linearGradient id="bg" x2="1" y2="1"><stop stop-color="#182c49"/><stop offset="1" stop-color="#101a30"/></linearGradient>
+    <linearGradient id="card"><stop stop-color="#f5f8fc"/><stop offset=".42" stop-color="#fff"/></linearGradient>
+  </defs>
+  <rect width="960" height="540" fill="url(#bg)"/>
+  <g font-family="Segoe UI,Arial,sans-serif">
+    <text x="36" y="45" fill="#f5f7ff" font-size="19" font-weight="700">OneProCloud</text>
+    <path d="M169 27v22" stroke="#fff" opacity=".2"/>
+    <text x="188" y="45" fill="#f5f7ff" font-size="19" font-weight="600">HyperBDR</text>
+    <text x="38" y="142" fill="#91a9c0" font-size="10" letter-spacing="1.7">AWS MARKETPLACE · ONBOARDING</text>
+    <text x="38" y="186" fill="#f4f7ff" font-size="27" font-weight="600">Connect your</text>
+    <text x="38" y="226" fill="#f4f7ff" font-size="27" font-weight="600">cloud subscription.</text>
+    <text x="38" y="262" fill="#91a9c0" font-size="12">Secure purchase verification</text>
+    <text x="38" y="282" fill="#91a9c0" font-size="12">and registered-account onboarding.</text>
+    <ellipse cx="165" cy="366" rx="120" ry="47" fill="none" stroke="#8fb0c9" stroke-opacity=".2" transform="rotate(-15 165 366)"/>
+    <ellipse cx="165" cy="366" rx="113" ry="56" fill="none" stroke="#8fb0c9" stroke-opacity=".18" stroke-dasharray="4 7" transform="rotate(16 165 366)"/>
+    <rect x="54" y="325" width="74" height="72" rx="17" fill="#18273d" stroke="#47647e"/>
+    <text x="91" y="360" text-anchor="middle" fill="#fff" font-size="25" font-weight="600">aws</text>
+    <path d="M73 367q18 11 37-2" fill="none" stroke="#f7ac4b" stroke-width="3" stroke-linecap="round"/>
+    <path d="M132 362h62" stroke="#8fb0c9" stroke-dasharray="2 7" stroke-linecap="round"/>
+    <circle cx="165" cy="362" r="13" fill="#18273d" stroke="#47647e"/>
+    <path d="m159 362 4 4 8-9" fill="none" stroke="#b7cede" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"/>
+    <rect x="202" y="335" width="74" height="72" rx="17" fill="#18273d" stroke="#47647e"/>
+    <path d="M222 365q20-37 36-3-15-13-28 5-8 5-8-2" fill="#fff"/>
+    <text x="239" y="392" text-anchor="middle" fill="#fff" font-size="10" font-weight="600">HyperBDR</text>
+    <rect x="331" y="99" width="590" height="360" rx="16" fill="url(#card)"/>
+    <g fill="none" stroke="#dce5ee"><path d="M370 134h490"/></g>
+    <circle cx="368" cy="134" r="12" fill="#eaf8f2"/><path d="m363 134 3 3 6-7" fill="none" stroke="#159d7e" stroke-width="2"/>
+    <text x="389" y="138" fill="#6b7d91" font-size="10">Receive token</text>
+    <circle cx="557" cy="134" r="12" fill="#457ab0"/><text x="557" y="138" text-anchor="middle" fill="#fff" font-size="10">2</text>
+    <text x="578" y="138" fill="#457ab0" font-size="10">Verify subscription</text>
+    <circle cx="751" cy="134" r="12" fill="#fff" stroke="#dce5ee"/><text x="751" y="138" text-anchor="middle" fill="#9aa6b7" font-size="10">3</text>
+    <text x="772" y="138" fill="#9aa6b7" font-size="10">Link account</text>
+    <text x="355" y="190" fill="#293d53" font-size="22" font-weight="600">aws</text>
+    <text x="355" y="230" fill="#26374b" font-size="19" font-weight="600">HyperBDR</text>
+    <text x="355" y="252" fill="#8b97a7" font-size="9">AWS Marketplace subscription</text>
+    <text x="355" y="292" fill="#929cad" font-size="9">AWS account</text>
+    <text x="355" y="310" fill="#526177" font-size="10">1234 •••• 9012</text>
+    <text x="355" y="346" fill="#929cad" font-size="9">Receipt ID</text>
+    <text x="355" y="364" fill="#526177" font-size="10">PREVIEW-ONLY</text>
+    <circle cx="361" cy="401" r="3" fill="#159d7e"/><text x="371" y="405" fill="#278e72" font-size="9">Purchase verified</text>
+    <text x="555" y="192" fill="#1b2941" font-size="22" font-weight="600">Review subscription details</text>
+    <text x="555" y="218" fill="#8892a2" font-size="10">Review your purchase before linking an account.</text>
+    <text x="555" y="259" fill="#526b85" font-size="12" font-weight="600">Subscription contents</text>
+    <path d="M555 274h337m-337 74h337" stroke="#e7edf4"/>
+    <text x="555" y="304" fill="#526b85" font-size="11">Example host entitlement</text>
+    <text x="891" y="307" text-anchor="end" fill="#457ab0" font-size="20">10 hosts</text>
+    <text x="555" y="329" fill="#8391a4" font-size="9">Valid until 11/16/2027</text>
+    <rect x="555" y="372" width="337" height="41" rx="7" fill="#457ab0"/>
+    <text x="723" y="397" text-anchor="middle" fill="#fff" font-size="12">Next: Link registered account →</text>
+    <rect x="564" y="478" width="357" height="38" rx="9" fill="#fff"/>
+    <text x="578" y="501" fill="#3c6289" font-size="10" font-weight="600">Offline mock</text>
+    <text x="662" y="501" fill="#7e8ca1" font-size="9">No submissions</text>
+    <rect x="851" y="485" width="60" height="25" rx="5" fill="#457ab0"/>
+    <text x="881" y="502" text-anchor="middle" fill="#fff" font-size="10">Next →</text>
+  </g>
+</svg>

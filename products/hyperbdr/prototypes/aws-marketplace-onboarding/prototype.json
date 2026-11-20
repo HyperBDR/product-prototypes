@@ -1,0 +1,16 @@
+{
+  "id": "aws-marketplace-onboarding",
+  "name": "AWS Marketplace SaaS 订阅开通",
+  "description": "当前多产品订阅开通原型的独立 HTML 导出：保留源页面布局、样式、文案、帮助、按钮、预览数据和交互。仅内嵌资源并将网络传输替换为本地 Mock。",
+  "status": "review",
+  "tags": [
+    "aws-marketplace",
+    "saas",
+    "onboarding",
+    "bilingual"
+  ],
+  "entry": "index.html",
+  "thumbnail": "thumbnail.svg",
+  "visible": true,
+  "order": 100
+}
