@@ -1,0 +1,10 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 640 360" role="img" aria-label="云同步网关升级管理缩略图">
+  <rect width="640" height="360" fill="#f5f7fa"/>
+  <rect width="640" height="36" fill="#24292e"/>
+  <rect y="36" width="92" height="324" fill="#fff"/>
+  <rect x="110" y="56" width="500" height="42" rx="4" fill="#fff1dc" stroke="#f2b96b"/>
+  <rect x="110" y="116" width="500" height="210" rx="4" fill="#fff" stroke="#e3e8ef"/>
+  <rect x="128" y="132" width="60" height="22" rx="3" fill="#4c8fc7"/>
+  <g fill="#edf1f5"><rect x="128" y="170" width="464" height="24"/><rect x="128" y="203" width="464" height="24"/><rect x="128" y="236" width="464" height="24"/><rect x="128" y="269" width="464" height="24"/></g>
+  <g fill="#79a8d3"><circle cx="151" cy="215" r="5"/><circle cx="151" cy="248" r="5"/><circle cx="151" cy="281" r="5"/></g>
+</svg>
