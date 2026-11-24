@@ -109,8 +109,17 @@ HyperFileLens, HyperBDR and HyperCDR under one product workspace.
   restored to its pre-prototype behavior.
 - This update publishes HTML, JavaScript and CSS only; no images are added or changed.
 
-Source snapshot: `oneprolabs/hyperfilelens` commit `25afc034b4bb52e84e2280534324123360dbd353`
-(`Refine HyperOne capability workspaces`). Only prebuilt, directory-local static
+## Host recovery configuration update
+
+- Host configuration groups storage and disaster recovery targets separately,
+  with recovery target setup consolidated in one menu group.
+- Production site, storage, recovery target and policy pages switch between
+  separate disaster recovery and failback data. Unsaved edits are guarded.
+- Host policies include incremental and full synchronization schedules, throttle
+  windows, snapshot quota, retention and sample host associations.
+
+Source snapshot: `oneprolabs/hyperfilelens` commit `2bcb70ca01a4cbdfd7c6db27b541bc19e514840c`
+(`Refine HyperOne host DR configuration`). Only prebuilt, directory-local static
 assets are published here; no source build tooling or dependencies are added.
 
 All data and operations are local fictional samples. The prototype does not
