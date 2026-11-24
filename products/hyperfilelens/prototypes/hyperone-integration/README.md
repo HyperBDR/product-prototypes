@@ -118,8 +118,15 @@ HyperFileLens, HyperBDR and HyperCDR under one product workspace.
 - Host policies include incremental and full synchronization schedules, throttle
   windows, snapshot quota, retention and sample host associations.
 
-Source snapshot: `oneprolabs/hyperfilelens` commit `2bcb70ca01a4cbdfd7c6db27b541bc19e514840c`
-(`Refine HyperOne host DR configuration`). Only prebuilt, directory-local static
+## Host node management update
+
+- Nodes & Proxies separates disaster recovery from failback and filters source
+  sync proxies, source agents, and cloud sync gateways by type.
+- Select eligible nodes and use the toolbar Upgrade action to simulate a batch
+  update; search and type filters remain on the right. File Proxy is unchanged.
+
+Source snapshot: `oneprolabs/hyperfilelens` commit `ea6a4137e8127803cd2ed6d36c0a0b464b5e43c7`
+(`Add scene-based host node upgrades`). Only prebuilt, directory-local static
 assets are published here; no source build tooling or dependencies are added.
 
 All data and operations are local fictional samples. The prototype does not
