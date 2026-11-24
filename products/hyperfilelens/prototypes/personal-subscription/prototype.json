@@ -1,0 +1,11 @@
+{
+  "id": "personal-subscription",
+  "name": "Personal Subscription",
+  "description": "Review personal plans, resource allowances, checkout, billing and renewal scenarios in English and Simplified Chinese.",
+  "status": "review",
+  "tags": [
+    "subscription",
+    "billing",
+    "personal edition"
+  ]
+}
