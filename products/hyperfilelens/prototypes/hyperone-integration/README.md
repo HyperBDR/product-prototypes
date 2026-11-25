@@ -125,8 +125,17 @@ HyperFileLens, HyperBDR and HyperCDR under one product workspace.
 - Select eligible nodes and use the toolbar Upgrade action to simulate a batch
   update; search and type filters remain on the right. File Proxy is unchanged.
 
-Source snapshot: `oneprolabs/hyperfilelens` commit `ea6a4137e8127803cd2ed6d36c0a0b464b5e43c7`
-(`Add scene-based host node upgrades`). Only prebuilt, directory-local static
+## Upgrade dialog and copy update
+
+- The batch upgrade dialog shows the target version and selected node details.
+  Canceling preserves the selection without starting the preview.
+- The single-node dialog separates confirmation, progress and completion.
+  Refreshing status preserves the last recorded state without live heartbeat data.
+- Bilingual workflow labels distinguish ordinary actions from previews and keep
+  notices about unavailable services and non-executable operations.
+
+Source snapshot: `oneprolabs/hyperfilelens` commit `d221a2ad34f0cc76d1f9f3c8ecae9204d904bb7f`
+(`Refine HyperOne upgrade dialogs and copy`). Only prebuilt, directory-local static
 assets are published here; no source build tooling or dependencies are added.
 
 All data and operations are local fictional samples. The prototype does not
