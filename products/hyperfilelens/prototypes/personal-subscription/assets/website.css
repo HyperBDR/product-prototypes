@@ -839,13 +839,33 @@ mjx-container > svg {
 .personal-plans .section-heading[data-v-e178a701] {
   margin-bottom: 28px;
 }
+.plan-demo-tools {
+  display: flex;
+  flex-wrap: wrap;
+  align-items: center;
+  justify-content: center;
+  gap: 8px 16px;
+  margin-block-end: 16px;
+}
+.plan-demo-link {
+  display: inline-flex;
+  align-items: center;
+  min-height: 34px;
+  color: var(--hfl-muted);
+  font-size: 13px;
+  text-decoration: underline;
+  text-underline-offset: 3px;
+}
+.plan-demo-link:hover,
+.plan-demo-link:focus-visible {
+  color: var(--hfl-ink);
+}
 .plan-preview-session[data-v-e178a701] {
   display: flex;
   flex-wrap: wrap;
   align-items: center;
   justify-content: center;
   gap: 8px;
-  margin-bottom: 16px;
   color: var(--hfl-muted);
   font-size: 13px;
 }

@@ -4,6 +4,7 @@ import test from 'node:test'
 import { Script, runInNewContext } from 'node:vm'
 
 const read = name => readFileSync(new URL(name, import.meta.url), 'utf8')
+const entry = read('./index.html').split('<script id="prototype-entry">')[1].split('</script>')[0]
 const checkout = read('./index.html').split('<script>')[1].split('</script>')[0]
 const restore = read('./personal-subscription-recovery.html').split('<script>')[1].split('</script>')[0]
 const model = checkout.slice(0, checkout.indexOf('const copy ='))
@@ -11,6 +12,21 @@ const model = checkout.slice(0, checkout.indexOf('const copy ='))
 test('both prototype entries parse as standalone scripts', () => {
   assert.doesNotThrow(() => new Script(checkout))
   assert.doesNotThrow(() => new Script(restore))
+})
+
+test('opens the full localized homepage by default without replacing console deep links', () => {
+  function destination(hash, language = 'en-US', search = '') {
+    const redirects = []
+    const location = { hash, search, replace: target => redirects.push(target) }
+    runInNewContext(entry, { location, navigator: { language }, URLSearchParams })
+    return redirects
+  }
+  assert.deepEqual(destination(''), ['./website-en.html'])
+  assert.deepEqual(destination('', 'zh-CN'), ['./website-zh.html'])
+  assert.deepEqual(destination('', 'en-US', '?lang=es'), ['./website-es.html'])
+  assert.deepEqual(destination('#/configuration/account/subscription'), [])
+  assert.deepEqual(destination('#/configuration/account/subscription?view=website-entry&plan=pro'), [])
+  assert.deepEqual(destination('#/configuration/account/subscription?view=checkout&order=HFL-0001'), [])
 })
 
 test('each website locale keeps the complete homepage and relative checkout links', () => {
@@ -22,6 +38,7 @@ test('each website locale keeps the complete homepage and relative checkout link
     assert.match(homepage, /<footer>/)
     assert.equal([...homepage.matchAll(/data-plan="(?:free|plus|pro|max)"/g)].length, 4)
     assert.match(homepage, /\.\/index\.html#\/configuration\/account\/subscription\?view=website-entry/)
+    assert.match(homepage, /class="plan-demo-link" href="\.\/index\.html#\/configuration\/account\/subscription\?lang=(?:zh|en)"/)
     assert.doesNotMatch(homepage, /127\.0\.0\.1|localhost|src="\//)
   }
   assert.doesNotThrow(() => new Script(read('./assets/website.js')))
