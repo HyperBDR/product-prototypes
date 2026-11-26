@@ -4421,14 +4421,7 @@ const Wallet = "Wallet";
 const XCircle = "XCircle";
 const Globe = "Globe";
 const Check = "Check";
-const websiteSession = ref('guest');
-const websiteCycle = ref('yearly');
-function selectWebsitePlan(plan) {
-    const params = new URLSearchParams({ view: 'website-entry', plan, cycle: websiteCycle.value, session: websiteSession.value });
-    location.hash = routeHash('home') + '?' + params;
-    syncRoute();
-}
-const websiteHome = computed(() => '#/website');
+const websiteHome = computed(() => `./website-${locale.value === 'zh' ? 'zh' : 'en'}.html`);
 const storageKey = 'hfl-personal-subscription-preview-v6';
 const websiteAccountKey = 'hfl-personal-subscription-website-account-v6';
 const profiles = ['personalA', 'personalB', 'organizationMember'];
@@ -4530,8 +4523,10 @@ const billingPanel = elementRef('billingPanel');
 const progressReturn = ref();
 const paymentBackLabel = computed(() => progressReturn.value?.source === 'bill' ? 'backToBills' : 'back');
 function syncRoute() {
-    if (location.hash.startsWith('#/website'))
+    if (location.hash.startsWith('#/website')) {
+        location.replace(websiteHome.value + (location.hash.includes('pricing') ? '#personal-plans' : ''));
         return;
+    }
     const [path, query] = location.hash.slice(1).split('?');
     const params = new URLSearchParams(query);
     const websiteSelection = websiteSelectionFrom(params);
@@ -5338,27 +5333,10 @@ async function copyTextToClipboard(text, fallbackContainer) {
 function websiteText(english, chinese) {
     return escapeHtml(locale.value === 'zh' ? chinese : english);
 }
-function websiteMarkup() {
-    const isYearly = websiteCycle.value === 'yearly';
-    const isCurrent = plan => websiteSession.value === 'paid' && plan.id === 'plus' && !isYearly;
-    return `<main class="website-preview"><header class="website-header"><a href="#/website" aria-label="HyperFileLens"><img src="${logo}" alt="HyperFileLens"></a><a href="#/website/pricing">${websiteText('Pricing', '套餐与定价')}</a></header>
-        <section class="website-hero"><h1>HyperFileLens</h1><p>${websiteText('Protect your data and turn backups into insights.', '保护数据，让备份发挥更多价值。')}</p><a class="btn primary" href="#/website/pricing">${websiteText('Compare Plans', '比较套餐')}</a></section>
-        <section class="website-pricing" id="website-pricing" aria-labelledby="website-pricing-title">
-        <h2 id="website-pricing-title">${websiteText('Personal Edition Plans', '个人版套餐')}</h2>
-        <p>${websiteText('Compare backup storage and AI Token allowances for Personal Edition.', '比较个人版各套餐的备份存储容量和 AI Token 配额。')}</p>
-        <div class="website-controls"><label>${websiteText('Preview Sign-In State', '登录状态演示')}
-        <select class="control"${attribute('data-selected', websiteSession.value)}${on('change', event => { websiteSession.value = event.target.value; })}>
-        <option value="guest">${websiteText('Signed Out', '未登录')}</option><option value="free">${websiteText('Signed In · Free', '已登录 · 免费版')}</option><option value="paid">${websiteText('Signed In · Plus Monthly', '已登录 · 进阶版月付')}</option></select></label>
-        <div class="website-cycle" role="group" aria-label="${websiteText('Billing Cycle', '计费周期')}">${['monthly', 'yearly'].map(interval => `<button class="btn${websiteCycle.value === interval ? ' primary' : ''}" type="button" aria-pressed="${websiteCycle.value === interval}"${on('click', () => { websiteCycle.value = interval; })}>${escapeHtml(t(interval))}${interval === 'yearly' ? ` · ${websiteText('Save 2 Months’ Fees', '省 2 个月费用')}` : ''}</button>`).join('')}</div></div>
-        <div class="website-grid">${plans.map(plan => `<article class="billing-card website-plan${plan.id === 'pro' ? ' is-recommended' : ''}">
-        <h3>${escapeHtml(t(plan.id))}</h3><p class="website-price"><strong>${escapeHtml(billingMoney(isYearly ? planPrice({ plan: plan.id, cycle: 'yearly' }) / 12 : plan.monthly))}</strong>${plan.id === 'free' ? '' : ` <small>${websiteText('/ Month', '/ 月')}</small>`}</p>
-        <div class="website-billing">${plan.id === 'free' ? websiteText('No Payment Required', '无需付款') : isYearly ? `${websiteText('Billed Yearly:', '每年支付')} ${escapeHtml(billingMoney(planPrice({ plan: plan.id, cycle: 'yearly' })))}<br><small>${websiteText('Yearly Savings:', '比月付 12 个月省')} ${escapeHtml(billingMoney(yearlySavings(plan.id)))}</small>` : websiteText('Billed Monthly', '按月付款')}</div>
-        <ul><li>${escapeHtml(t('storage'))} · <strong>${escapeHtml(size(plan.storage))}</strong></li><li>${websiteText('Monthly AI Token Allowance', '每月 AI Token 配额')} · <strong>${escapeHtml(number(plan.tokens))}</strong></li><li>${escapeHtml(t('publicGatewayCapacity'))} · <strong>${publicGatewayCapacityMb} MB</strong></li></ul>
-        <button class="btn${plan.id === 'pro' ? ' primary' : ''}" type="button"${on('click', () => selectWebsitePlan(plan.id))}>${isCurrent(plan) ? websiteText('View Current Plan', '查看当前套餐') : plan.id === 'free' ? websiteText('Start with Free', '开始使用免费版') : websiteText(`Choose ${t(plan.id)}`, `选择${t(plan.id)}`)}</button></article>`).join('')}</div><p>${escapeHtml(t('usdTaxInclusive'))}</p></section></main>`;
-}
+
 function websiteLoginMarkup() {
     return `<main class="website-preview"><div class="website-login"><section class="website-login-brand"><img src="${logo}" alt="HyperFileLens"><p>${websiteText('Protect your data. Recover with confidence.', '保护数据，安心恢复。')}</p></section>
-        <section class="website-login-panel"><a href="#/website/pricing">← ${websiteText('Back to Pricing', '返回定价')}</a><h1>${websiteText('Sign In', '登录')}</h1>
+        <section class="website-login-panel"><a href="${websitePricing.value}">← ${websiteText('Back to Pricing', '返回定价')}</a><h1>${websiteText('Sign In', '登录')}</h1>
         <label>${websiteText('Email', '邮箱')}<input class="control" type="email" autocomplete="off"></label><label>${websiteText('Password', '密码')}<input class="control" type="password" autocomplete="off"></label>
         <button class="btn primary" type="button"${on('click', () => completeWebsiteSelection(websiteSignIn.value))}>${websiteText('Sign In', '登录')}</button></section></div></main>`;
 }
@@ -5373,8 +5351,6 @@ function checkoutConfirmationMarkup(autoRenew, renewalSchedule, renewalSummaryId
         `<p>${escapeHtml(t('oneTimePayment'))}</p>`}</div>` : ''}<p class="bc-checkout-terms">${richText("checkoutLegalNotice", { "terms": `<a class="checkout-text-link" href="https://oneprocloud.com/eula" target="_blank" rel="noopener noreferrer">${escapeHtml(t('checkoutTerms'))}</a>`, "privacy": `<a class="checkout-text-link" href="https://oneprocloud.com/privacy-policy" target="_blank" rel="noopener noreferrer">${escapeHtml(t('checkoutPrivacy'))}</a>` })}</p></div>`;
 }
 function pageMarkup() {
-    if (location.hash.startsWith('#/website'))
-        return websiteMarkup();
     return `${(websiteSignIn.value) ? `${websiteLoginMarkup()}` :
         `<header${attribute('class', "topbar" + ' ' + classNames(({ 'topbar--checkout': checkoutOrder.value })))}><a class="brand"${attribute("href", (websiteHome.value))}><img${attribute("src", (logo))} alt="HyperFileLens"></a><nav class="topnav"${attribute("aria-label", (t('configuration')))}>${repeat(navItems, (item) => `<button type="button"${attribute("class", ({ active: item === activeNavItem.value }))}${attribute("aria-current", (item === activeNavItem.value ? 'page' : undefined))}${on("click", ($event) => { item === 'overview' ? go('overview') : item === 'configuration' ? go('home') : item === 'protection' && recovery.value ? go('restore') : openModal('scope'); }, [])}>${escapeHtml(t(item))}</button>`)}</nav><div class="toptools"><button type="button" class="scenario-trigger"${attribute("title", (t('scenarios')))}${attribute("aria-label", (t('scenarios')))} aria-haspopup="dialog" aria-controls="preview-dialog"${on("click", ($event) => { openModal('scenarios'); }, [])}>${icon("FlaskConical", ` aria-hidden="true"`)}<span>${escapeHtml(t('scenarios'))}</span></button>${languageMenu()}<button type="button" class="notification-trigger"${attribute("title", (t('notifications')))}${attribute("aria-label", (t('notifications')))}${on("click", ($event) => { openModal('notifications'); }, [])}>${icon("Bell", ``)}</button><details data-ref="accountMenu" class="account-menu"${on("keydown", ($event) => { accountMenu.value?.removeAttribute('open'); }, ["esc"])}><summary class="user-chip"${attribute("aria-label", (t(profile.value)))}>${(checkoutOrder.value) ? `${icon("UserRound", ` class="checkout-account-icon" aria-hidden="true"`)}` : ''}<span>${escapeHtml(t(profile.value))}</span>${icon("ChevronDown", ` aria-hidden="true"`)}</summary><div class="account-menu-items"><button type="button"${on("click", ($event) => { openModal('personalSettings'); }, [])}>${icon("UserRound", ``)}${escapeHtml(t('personalSettings'))}</button></div></details></div></header><div class="bc-console">${(recoveryBanner.value && recovery.value) ? `<div class="bc-recovery-strip"${attribute("data-urgent", (recovery.value.stage === 'lastDay'))} role="status">${icon("Clock", ` class="icon" aria-hidden="true"`)}<div class="bc-recovery-strip-content"><div class="bc-recovery-strip-action"><span${attribute("plural", (recovery.value.days))}>${richText("recoveryCountdown", { "days": `<strong>${escapeHtml(recovery.value.days)}</strong>`, "deadline": `<strong>${escapeHtml(recoveryDate.value)}</strong>` }, recovery.value.days)}</span>${(view.value !== 'restore') ? `<a${attribute("href", (routeHash('restore')))}>${escapeHtml(t('restoreBackups'))}</a>` :
             (account.value.storage > 0) ? `<span>${escapeHtml(t('recoverySelectSourceHint'))}</span>` : ''}</div></div></div>` :

@@ -13,6 +13,20 @@ test('both prototype entries parse as standalone scripts', () => {
   assert.doesNotThrow(() => new Script(restore))
 })
 
+test('each website locale keeps the complete homepage and relative checkout links', () => {
+  for (const language of ['en', 'es', 'zh']) {
+    const homepage = read(`./website-${language}.html`)
+    for (const section of ['hero-title', 'use-cases', 'how-it-works', 'personal-plans', 'open-source', 'blog', 'contact']) {
+      assert.ok(homepage.includes(`id="${section}"`), `${language}: ${section}`)
+    }
+    assert.match(homepage, /<footer>/)
+    assert.equal([...homepage.matchAll(/data-plan="(?:free|plus|pro|max)"/g)].length, 4)
+    assert.match(homepage, /\.\/index\.html#\/configuration\/account\/subscription\?view=website-entry/)
+    assert.doesNotMatch(homepage, /127\.0\.0\.1|localhost|src="\//)
+  }
+  assert.doesNotThrow(() => new Script(read('./assets/website.js')))
+})
+
 test('keeps USD plan and tax arithmetic consistent', () => {
   assert.equal(runInNewContext(`${model}\nplanPrice({ plan: 'plus', cycle: 'yearly' })`), 58.1)
   assert.equal(runInNewContext(`${model}\nJSON.stringify(demoCheckoutTaxBreakdown(58.1))`), '{"subtotal":52.82,"tax":5.28}')
