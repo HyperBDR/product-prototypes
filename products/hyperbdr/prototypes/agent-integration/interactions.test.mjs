@@ -33,13 +33,13 @@ test('expiry takes precedence over enabled state and expired tokens cannot be en
 test('deletion removes only the target token and cannot be toggled back',()=>{const {store}=modelSetup();assert.equal(store.delete(1),true);assert.equal(store.find(1),undefined);assert.equal(store.toggle(1,referenceNow),false);assert.equal(store.records.length,3);assert.ok(store.find(2));assert.equal(store.delete(1),false);});
 test('bulk disable changes only currently enabled, unexpired tokens',()=>{const {store}=modelSetup();assert.equal(store.disable([1,2,3,4],referenceNow),2);assert.equal(store.find(1).s,'disabled');assert.equal(store.find(2).s,'disabled');assert.equal(store.find(3).s,'disabled');assert.equal(store.find(4).s,'active');});
 test('new tokens store only a masked prefix and use GMT+08 timestamps',()=>{const {store}=modelSetup();const raw='hbd_pat_'+'a'.repeat(64),t=store.create({n:'Agent',d:'demo',days:30},raw,referenceNow);assert.equal(t.c,'2026-11-17 12:00:00');assert.equal(t.e,'2026-12-17 12:00:00');assert.equal(t.p,raw.slice(0,13)+'...');assert.ok(!JSON.stringify(store.records).includes(raw));assert.throws(()=>store.create({n:'',d:'',days:30},raw,referenceNow));assert.throws(()=>store.create({n:'demo',d:'',days:0},raw,referenceNow));});
-function uiSetup(access=false){
+function uiSetup(access=false,beforeStartup=''){
  const handlers={},nodes=new Map();let document;
  function element(id){if(!nodes.has(id))nodes.set(id,{id,hidden:['create','created','confirm','toast','auditDetail','tokenMoreMenu','promptTokenDropdown','promptTokenNoMatch','promptTokenClear'].includes(id),value:id==='days'?'30':'',textContent:'',innerHTML:'',disabled:false,isConnected:true,dataset:{},style:{},attributes:{},setAttribute(name,value){this.attributes[name]=String(value);},classList:{values:new Set(),toggle(name,force){const on=force===undefined?!this.values.has(name):force;on?this.values.add(name):this.values.delete(name);return on;},contains(name){return this.values.has(name);}},focus(){document.activeElement=this;},click(){if(this.onclick)this.onclick({});},querySelector(){return element('confirmationCancel');},querySelectorAll(){return[];},getClientRects(){return[{}];}});return nodes.get(id);}
  const fake={querySelector:()=>({querySelector:()=>element('fake'),querySelectorAll:()=>[],innerHTML:'',textContent:''}),querySelectorAll:()=>[]};document={getElementById:element,querySelector:()=>fake,querySelectorAll:()=>[],documentElement:{},body:{style:{}},activeElement:null,addEventListener(type,fn){handlers[type]=fn;}};
  const context=vm.createContext({window:{__TEST__:true,addEventListener(){},AGENT_MESSAGES:{zh:{statuses:{active:'active',disabled:'disabled',expired:'expired'},confirmDisableAllLead:'{n}',confirmDisableLead:'{name}',confirmEnableLead:'{name}',confirmDeleteLead:'{name}',confirmDisableBody:'body',confirmEnableBody:'body',confirmDisableNote:'note',confirmEnableNote:'note',confirmDeleteBody:'body',confirmDeleteNote:'danger',confirmCreateLead:'policy',confirmCreateBody:'body',confirmCreateNote:'note',name:'Name',expiry:'Expiration',expiryAt:'Expiration',actions:{enable:'enable',disable:'disable',delete:'delete',cannotEnable:'cannotEnable'},count:(n,a)=>String(n)},en:{statuses:{active:'active',disabled:'disabled',expired:'expired'},confirmDisableAllLead:'{n}',confirmDisableLead:'{name}',confirmEnableLead:'{name}',confirmDeleteLead:'{name}',confirmDisableBody:'body',confirmEnableBody:'body',confirmDisableNote:'note',confirmEnableNote:'note',confirmDeleteBody:'body',confirmDeleteNote:'danger',confirmCreateLead:'policy',confirmCreateBody:'body',confirmCreateNote:'note',name:'Name',expiry:'Expiration',expiryAt:'Expiration',actions:{enable:'enable',disable:'disable',delete:'delete',cannotEnable:'cannotEnable'},count:(n,a)=>String(n)}},AgentI18n:{language:'zh',t:(k)=>k,toggle(){}}},document,Date:class extends Date{constructor(...args){super(...(args.length?args:[referenceNow]));}static now(){return referenceNow;}},Uint8Array,crypto:{getRandomValues(arr){arr.fill(13);return arr;}},navigator:{clipboard:{writeText:async()=>{}}},setTimeout(){return 1;},clearTimeout(){},setInterval(){}});
  const dictionary=vm.createContext({window:{}});vm.runInContext(readFileSync(path.join(dir,'translations.js'),'utf8'),dictionary);for(const language of ['zh','en'])context.window.AGENT_MESSAGES[language].list=dictionary.window.AGENT_MESSAGES[language].list;
- vm.runInContext(script,context);if(access)vm.runInContext(readFileSync(path.join(dir,'translations.js'),'utf8'),context);
+ vm.runInContext(script.replace('const store=new TokenStore(),$=id=>document.getElementById(id);','const store=new TokenStore(),$=id=>document.getElementById(id);'+beforeStartup),context);if(access)vm.runInContext(readFileSync(path.join(dir,'translations.js'),'utf8'),context);
  const click=(attr,id)=>handlers.click({target:{closest(selector){if(selector===attr)return{id,disabled:false,dataset:attr==='[data-prompt-token]'?{promptToken:id}:attr==='[data-token-page]'?{tokenPage:id}:attr==='[data-audit-page]'?{auditPage:id}:attr==='[data-audit-detail]'?{auditDetail:id}:attr==='[data-close]'?{close:id}:attr==='[data-toggle]'?{toggle:id}:{delete:id}};return null;}}});
  const selectToken=(id,checked)=>handlers.change({target:{closest:selector=>selector==='[data-token-select]'?{checked,dataset:{tokenSelect:String(id)}}:null}});
  return{element,context,click,selectToken,key:e=>handlers.keydown({...e,preventDefault(){}})};
@@ -181,13 +181,13 @@ test('creation and explanatory copy consistently call the credential an access t
 });
 
 
-test('integration uses the requested title, prominent labels and an initially empty searchable combobox',()=>{
+test('integration uses the requested title, prominent labels and a default eligible token in the searchable combobox',()=>{
  const c=vm.createContext({window:{}});vm.runInContext(readFileSync(path.join(dir,'translations.js'),'utf8'),c);
  assert.equal(c.window.AGENT_MESSAGES.zh.promptTitle,'生成智能体安装提示词');assert.equal(c.window.AGENT_MESSAGES.en.promptSelect,'Please Select');
  assert.doesNotMatch(html,/生成 Agent 安装提示词|<select id="promptToken"/);
  assert.match(html,/id="promptToken"[^>]*role="combobox"[^>]*aria-autocomplete="list"/);
  assert.match(html,/#promptTokenLabel,\.prompt-result-label\{[^}]*font-weight:700;color:#262626/);
- const {element}=uiSetup(true);element('promptToken').onfocus();assert.equal(element('promptToken').value,'');assert.equal(element('promptToken').placeholder,'请选择');assert.equal(element('generatePrompt').disabled,true);assert.match(element('promptTokenOptions').innerHTML,/production-cli|staging-agent/);assert.doesNotMatch(element('promptTokenOptions').innerHTML,/old-macbook|temporary-test/);
+ const {element}=uiSetup(true);element('promptToken').onfocus();assert.equal(element('promptToken').value,'');assert.match(element('promptToken').placeholder,/production-cli/);assert.equal(element('generatePrompt').disabled,false);assert.match(element('promptTokenOptions').innerHTML,/production-cli|staging-agent/);assert.doesNotMatch(element('promptTokenOptions').innerHTML,/old-macbook|temporary-test/);
 });
 
 test('token search matches name, ID and masked prefix without indexing secrets or unavailable tokens',()=>{
@@ -211,7 +211,7 @@ test('invalidated selections return to empty instead of silently selecting the n
 
 test('agent-flow creation selects the new token but does not auto-generate and canceled intent is cleared',()=>{
  const {element,click}=uiSetup(true);element('newPromptToken').onclick();element('name').value='New Agent';element('submit').onclick();element('confirmOk').onclick();assert.match(element('promptToken').value,/New Agent/);assert.equal(element('generatePrompt').disabled,false);assert.doesNotMatch(element('promptOutput').innerHTML,/npx hyperbdr/);click('[data-close]','created');
- const other=uiSetup(true);other.element('newPromptToken').onclick();other.click('[data-close]','create');other.element('new').onclick();other.element('name').value='Manager Token';other.element('submit').onclick();other.element('confirmOk').onclick();assert.equal(other.element('promptToken').value,'');assert.equal(other.element('generatePrompt').disabled,true);
+ const other=uiSetup(true);other.element('newPromptToken').onclick();other.click('[data-close]','create');other.element('new').onclick();other.element('name').value='Manager Token';other.element('submit').onclick();other.element('confirmOk').onclick();assert.match(other.element('promptToken').value,/production-cli/);assert.equal(other.element('generatePrompt').disabled,false);assert.doesNotMatch(other.element('promptToken').value,/Manager Token/);
 });
 
 
@@ -225,4 +225,150 @@ test('reopening, searching and reselecting never disable a valid committed token
  // Committing a different valid option changes the token, but not button availability.
  input.onfocus();input.value='stag';input.oninput();click('[data-prompt-token]',2);assert.equal(element('generatePrompt').disabled,false);assert.doesNotMatch(element('promptOutput').innerHTML,/npx hyperbdr/);element('generatePrompt').onclick();assert.match(element('promptOutput').innerHTML,/--api-key sl_agent_8vJq/);
  element('promptTokenClear').onclick();assert.equal(element('generatePrompt').disabled,true);assert.doesNotMatch(element('promptOutput').innerHTML,/npx hyperbdr/);
+});
+
+
+test('agent usage examples follow the prompt card and describe customer tasks rather than installation steps',()=>{
+ const start=html.indexOf('<section class="card agent-usage"');
+ const end=html.indexOf('<div id="tokenPage"',start);
+ const section=html.slice(start,end);
+ assert.ok(start>html.indexOf('id="promptNote"'));
+ assert.ok(end>start);
+ assert.match(section,/aria-labelledby="agentUsageTitle"/);
+ assert.match(section,/您可以这样使用智能体/);
+ assert.equal((section.match(/<h3 id="agentUsageTitle[1-6]"/g)||[]).length,6);
+ assert.equal((section.match(/class="agent-usage-prompts" id="agentUsagePrompt[1-6]"/g)||[]).length,6);
+ for(const title of ['创建源端','创建目标端','启动配置','数据同步','演练启动','资源清理'])assert.ok(section.includes(title));
+ assert.match(section,/待我确认后再操作/);
+ assert.match(section,/<ol class="agent-usage-flow">/);
+ assert.equal((section.match(/class="agent-usage-arrow"/g)||[]).length,5);
+ assert.doesNotMatch(section,/<button|aria-current|aria-valuenow/);
+ assert.doesNotMatch(section,/npx |hyperbdrctl|安装 skills|使用指南|sl_agent_/);
+ assert.ok(html.includes('const m=L();renderAgentUsage();'));
+});
+
+test('usage copy has matching bilingual fields and keeps confirmation and network requirements',()=>{
+ const c=vm.createContext({window:{}});vm.runInContext(readFileSync(path.join(dir,'translations.js'),'utf8'),c);
+ const {zh,en}=c.window.AGENT_MESSAGES;
+ assert.deepEqual(Object.keys(zh.usage).sort(),Object.keys(en.usage).sort());
+ for(const lang of [zh,en]){assert.equal(lang.usage.examples.length,6);for(const example of lang.usage.examples)assert.deepEqual(Object.keys(example).sort(),['detail','prompts','title']);}
+ for(const example of zh.usage.examples)assert.match(example.prompts.join(''),/待我确认后/);
+ for(const example of en.usage.examples)assert.match(example.prompts.join(' '),/wait for my confirmation/i);
+ assert.match(zh.usage.reminder,/说明影响.*确认执行/);
+ assert.match(en.usage.reminder,/impact before confirming/);
+ assert.match(zh.usage.networkBefore,/智能体运行环境.*HTTPS/);
+ assert.match(en.usage.networkBefore,/agent runtime.*HTTPS/);
+});
+
+test('usage renderer switches languages with safe text output and shares the installation service domain',()=>{
+ const dictionary=vm.createContext({window:{}});vm.runInContext(readFileSync(path.join(dir,'translations.js'),'utf8'),dictionary);
+ const nodes=new Map(),element=id=>{if(!nodes.has(id))nodes.set(id,{textContent:''});return nodes.get(id);};
+ const c=vm.createContext({window:{AgentI18n:{language:'zh'}},$:element,L:()=>dictionary.window.AGENT_MESSAGES[c.window.AgentI18n.language],text:(node,value)=>{node.textContent=value;}});
+ const constant=script.match(/const AGENT_SERVICE_URL='[^']+';/)[0];
+ const renderer=script.match(/function renderAgentUsage\(\)\{[\s\S]*?\n\}/)[0];
+ vm.runInContext(constant+renderer+';renderAgentUsage();',c);
+ assert.equal(element('agentUsageTitle').textContent,'您可以这样使用智能体');
+ assert.match(element('agentUsagePrompt1Line1').textContent,/选择 Agent 或 Agentless/);
+ assert.equal(element('agentUsageDetail1').textContent,'Agent / Agentless');
+ assert.equal(element('agentUsageTitle6').textContent,'资源清理');
+ assert.equal(element('agentUsageFlowTitle').textContent,'参考操作流程');
+ assert.equal(element('agentUsageDomain').textContent,'hyperbdr.com');
+ c.window.AgentI18n.language='en';vm.runInContext('renderAgentUsage()',c);
+ assert.equal(element('agentUsageTitle').textContent,'Ways to use your agent');
+ assert.match(element('agentUsagePrompt2Line1').textContent,/Alibaba Cloud/);
+ assert.equal(element('agentUsageTitle6').textContent,'Clean up resources');
+ assert.equal(element('agentUsagePromptLabel').textContent,'Example prompts');
+ dictionary.window.AGENT_MESSAGES.en.usage.examples[0].prompts[0]='<img src=x onerror=alert(1)>';
+ vm.runInContext('renderAgentUsage()',c);assert.match(element('agentUsagePrompt1Line1').textContent,/<img src=x/);
+ assert.ok(script.includes('install --url ${AGENT_SERVICE_URL} --api-key'));
+});
+
+
+test('workflow copy follows source, target, boot configuration, sync, drill and cleanup in both languages',()=>{
+ const c=vm.createContext({window:{}});vm.runInContext(readFileSync(path.join(dir,'translations.js'),'utf8'),c);
+ const {zh,en}=c.window.AGENT_MESSAGES;
+ assert.deepEqual(Array.from(zh.usage.examples,e=>e.title),['创建源端','创建目标端','启动配置','数据同步','演练启动','资源清理']);
+ assert.deepEqual(Array.from(en.usage.examples,e=>e.title),['Set up source','Set up target','Boot configuration','Data sync','Start DR drill','Clean up resources']);
+ assert.equal(zh.usage.examples[0].detail,'Agent / Agentless');
+ assert.match(zh.usage.examples[1].detail,/启动到哪个云/);
+ assert.match(zh.usage.examples[5].prompts.join(''),/依赖关系.*清理范围和影响.*保留仍在使用/);
+ assert.match(en.usage.examples[5].prompts.join(' '),/dependencies.*scope and impact.*still in use/);
+ assert.match(zh.usage.intro,/提示词示例.*实际环境/);
+ assert.ok(html.includes('grid-template-columns:var(--usage-stage-width) minmax(0,1fr)'));
+ assert.match(html,/@media\(max-width:640px\)\{\.agent-usage-flow-head/);
+});
+
+
+test('workflow has no visible numbering or quotation wrappers and offers multiple plain-language prompt lines',()=>{
+ const start=html.indexOf('<section class="card agent-usage"');const section=html.slice(start,html.indexOf('</section>',start));
+ assert.doesNotMatch(section,/agent-usage-order|<blockquote|[“”「」‘’]/);
+ assert.equal((section.match(/id="agentUsagePrompt[1-6]Line[12]"/g)||[]).length,12);
+ assert.match(html,/\.agent-usage-flow\{list-style:none/);
+ assert.match(html,/\.agent-usage-prompts p\+p\{margin-top:8px/);
+ const c=vm.createContext({window:{}});vm.runInContext(readFileSync(path.join(dir,'translations.js'),'utf8'),c);
+ for(const lang of ['zh','en'])for(const example of c.window.AGENT_MESSAGES[lang].usage.examples){
+  assert.equal(example.prompts.length,2);
+  for(const line of example.prompts){assert.ok(line.trim().length>0);assert.doesNotMatch(line,/[“”「」‘’]/);}
+ }
+ assert.ok(script.includes("'Line'+(line+1)),prompt)"));
+});
+
+
+test('never-expiring tokens have a null expiry and retain enable, disable and delete behavior',()=>{
+ const {store,context}=modelSetup();const raw='sl_agent_'+'x'.repeat(40);
+ const token=store.create({n:'Never expires',d:'',days:'never'},raw,referenceNow);
+ assert.equal(token.e,null);assert.equal(context.state(token,Date.parse('2099-01-01')), 'active');
+ assert.equal(store.toggle(token.id,referenceNow),true);assert.equal(context.state(token,referenceNow),'disabled');assert.equal(token.e,null);
+ assert.equal(store.toggle(token.id,referenceNow),true);assert.equal(context.state(token,referenceNow),'active');
+ assert.equal(store.disable([token.id],referenceNow),1);assert.equal(token.e,null);
+ assert.equal(store.delete(token.id),true);assert.equal(store.find(token.id),undefined);
+ assert.ok(!JSON.stringify(store.records).includes(raw));
+});
+
+test('expiry selector defaults to Never Expires and both creation entry points reset it',()=>{
+ assert.match(html,/<option value="never" selected>永不过期<\/option>/);
+ for(const days of [7,30,90,180,365])assert.ok(html.includes('value="'+days+'"'));
+ const {element,click}=uiSetup(true);
+ element('new').onclick();assert.equal(element('days').value,'never');element('days').value='90';click('[data-close]','create');
+ element('newPromptToken').onclick();assert.equal(element('days').value,'never');element('days').value='7';click('[data-close]','create');
+ element('new').onclick();assert.equal(element('days').value,'never');
+});
+
+test('never-expiring creation is confirmed, cancellable and rendered without fabricated dates',()=>{
+ const {element,click}=uiSetup(true);element('new').onclick();element('name').value='Long lived';element('submit').onclick();
+ assert.match(element('confirmCopy').innerHTML,/永不过期/);assert.match(element('confirmCopy').innerHTML,/无到期时间/);
+ assert.doesNotMatch(element('confirmCopy').innerHTML,/GMT\+08|Invalid|NaN|到期后/);
+ click('[data-close]','confirm');assert.equal(element('days').value,'never');assert.equal(element('create').hidden,false);
+ element('submit').onclick();element('confirmOk').onclick();assert.equal(element('created').hidden,false);assert.equal(element('outExp').value,'永不过期');
+ assert.match(element('rows').innerHTML,/Long lived/);assert.match(element('rows').innerHTML,/>永不过期<\/td>/);assert.doesNotMatch(element('rows').innerHTML,/>null</);
+});
+
+test('English Never Expires and finite expiry creation retain their distinct policy and output',()=>{
+ const {element,context}=uiSetup(true);context.window.AgentI18n.language='en';element('new').onclick();element('name').value='English token';element('submit').onclick();
+ assert.match(element('confirmCopy').innerHTML,/Never Expires/);assert.match(element('confirmCopy').innerHTML,/no expiration date/);assert.doesNotMatch(element('confirmCopy').innerHTML,/GMT\+08|NaN/);
+ element('confirmOk').onclick();assert.equal(element('outExp').value,'Never Expires');assert.match(element('rows').innerHTML,/Never Expires/);
+ const finite=uiSetup(true);finite.element('new').onclick();finite.element('days').value='7';finite.element('name').value='Finite';finite.element('submit').onclick();assert.match(finite.element('confirmCopy').innerHTML,/7 天/);assert.match(finite.element('confirmCopy').innerHTML,/2026-11-24 12:00:00 GMT\+08:00/);finite.element('confirmOk').onclick();assert.equal(finite.element('outExp').value,'2026-11-24 12:00:00 GMT+08:00');
+});
+
+test('startup selects the first eligible token in list order and prepares its localized prompt without a generation event',()=>{
+ const first=uiSetup(true);assert.match(first.element('promptToken').value,/production-cli/);assert.equal(first.element('generatePrompt').disabled,false);assert.match(first.element('promptOutput').innerHTML,/npx hyperbdr-agent-kit install/);assert.match(first.element('copyPrompt').dataset.prompt,/--api-key sl_agent_xrJlWsp/);
+ assert.doesNotMatch(first.element('auditRows').innerHTML,/生成了 HyperBDR/);
+ const reordered=uiSetup(true,'store.records.reverse();');assert.match(reordered.element('promptToken').value,/staging-agent/);assert.match(reordered.element('copyPrompt').dataset.prompt,/--api-key sl_agent_8vJq/);
+ const skip=uiSetup(true,"store.records[0].s='disabled';");assert.match(skip.element('promptToken').value,/staging-agent/);
+});
+
+test('startup without eligible tokens stays empty and explicit clear never reselects a token',()=>{
+ for(const seed of ['store.records=[];',"store.records.forEach(t=>t.s='disabled');"]){const {element}=uiSetup(true,seed);assert.equal(element('promptToken').value,'');assert.equal(element('generatePrompt').disabled,true);assert.doesNotMatch(element('promptOutput').innerHTML,/npx hyperbdr/);}
+ const {element}=uiSetup(true);element('promptTokenClear').onclick();element('tokenRefresh').onclick();assert.equal(element('promptToken').value,'');assert.equal(element('generatePrompt').disabled,true);assert.doesNotMatch(element('promptOutput').innerHTML,/npx hyperbdr/);
+});
+
+
+test('workflow alignment shares column widths, aligns first text lines and centers connecting arrows',()=>{
+ assert.match(html,/\.agent-usage-content\{--usage-stage-width:176px/);
+ assert.equal((html.match(/grid-template-columns:var\(--usage-stage-width\) minmax\(0,1fr\)/g)||[]).length,2);
+ assert.match(html,/\.agent-usage-flow-head>span:first-child\{padding-left:17px/);
+ assert.match(html,/\.agent-usage-stage\{[^}]*justify-content:flex-start;[^}]*padding:12px 16px;border:1px/);
+ assert.match(html,/\.agent-usage-prompts\{align-self:stretch;min-width:0;padding:13px 0/);
+ assert.match(html,/\.agent-usage-arrow\{[^}]*left:calc\(var\(--usage-stage-width\)\/2 - 6px\)/);
+ assert.match(html,/@media\(max-width:900px\)\{\.agent-usage-content\{--usage-stage-width:144px/);
 });
