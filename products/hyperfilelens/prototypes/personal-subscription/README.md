@@ -5,6 +5,7 @@ Open `index.html` directly to review the HyperFileLens Personal Edition subscrip
 - **Billing Scenarios** switches accounts and demonstrates usage limits, checkout outcomes, scheduled plan changes, and renewal states.
 - The checked scenario identifies the starting state loaded for that account, not its current billing status. Use **Reload Scenario** to start over without switching scenarios.
 - Compare monthly and yearly pricing in the plan picker. Yearly is the default for free accounts; paid accounts start on their current billing cycle.
+- Checkout shows a pretax subtotal, sample tax, and the tax-inclusive amount due. The demo split does not change the payment amount or calculate real taxes.
 - Use **Manual Renewal · Not Near Expiry** to try an early renewal or **Yearly Auto-Renewal** to compare the overview before and during the reminder window.
 - Exhausted storage and AI quota scenarios link to plan comparison when a higher allowance is available.
 - **Simulate AI Token Quota Reset** moves the preview to the next reset date and opens Resource Usage with the new cycle's available allowance.
