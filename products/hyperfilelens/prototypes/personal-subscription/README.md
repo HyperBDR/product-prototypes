@@ -1,6 +1,6 @@
 # Personal Subscription
 
-Open `index.html` directly to review the HyperFileLens Personal Edition subscription flows. The page uses native HTML, CSS, and JavaScript and does not require installation, a build, or a backend. Billing, payment, and resource usage are simulated; the page does not collect payment details.
+Open `index.html` to start at the full HyperFileLens homepage. Choose **Pricing** and select a plan to try the website-to-product flow. For repeat reviews, use **Open Subscription Demo** next to the sign-in state selector, or open `index.html#/configuration/account/subscription` directly. The prototype uses native HTML, CSS, and JavaScript and does not require installation, a build, or a backend. Billing, payment, and resource usage are simulated; the page does not collect payment details.
 
 - **Billing Scenarios** switches accounts and demonstrates usage limits, checkout outcomes, scheduled plan changes, and renewal states.
 - The checked scenario identifies the starting state loaded for that account, not its current billing status. Use **Reload Scenario** to start over without switching scenarios.

@@ -5,6 +5,14 @@
   <meta name="viewport" content="width=device-width, initial-scale=1">
   <meta name="robots" content="noindex, nofollow">
   <title>HyperFileLens · Personal Subscription</title>
+  <script id="prototype-entry">
+    if (!location.hash) {
+      const requestedLanguage = new URLSearchParams(location.search).get('lang');
+      const language = (requestedLanguage || navigator.language || 'en').toLowerCase();
+      const locale = /^zh(?:-|$)/.test(language) ? 'zh' : /^es(?:-|$)/.test(language) ? 'es' : 'en';
+      location.replace(`./website-${locale}.html`);
+    }
+  </script>
   <style>
 .billing-panel {
   background: var(--bg);
@@ -5588,7 +5596,7 @@ function pageMarkup() {
                                                     (modal.value === 'billingSupport') ? `<div class="bc-billing-support-fields">${repeat(billingSupportFields.value, (field) => `<div class="bc-billing-support-field"><div class="bc-billing-support-field-heading"><h3>${escapeHtml(t(field.label))}</h3><button type="button" class="btn"${on("click", ($event) => { copyBillingSupport(field); }, [])}>${escapeHtml(t(field.action))}</button></div><p${attribute('class', "bc-billing-support-value" + ' ' + classNames(({ 'is-template': field.label === 'billingSupportBodyLabel' })))}>${escapeHtml(field.value)}</p><p role="status"${attribute('class', "bc-billing-support-feedback" + ' ' + classNames(({ 'is-error': billingSupportFeedback.value?.failed })))}>${escapeHtml(billingSupportFeedback.value?.label === field.label ? t(billingSupportFeedback.value.failed ? 'billingSupportCopyFailed' : 'billingSupportCopied', { field: t(field.label) }) : '')}</p></div>`)}</div><p class="bc-dialog-note bc-billing-support-note">${escapeHtml(t(hasConfiguredSupportEmail ? 'billingSupportNote' : 'billingSupportSafety'))}</p>` :
                                                         (modal.value === 'personalSettings' || modal.value === 'notifications') ? `<p>${escapeHtml(t('previewAccountScope'))}</p>` : ''}</div></dialog><div class="native-toasts" aria-live="polite"></div>`}`;
 }
-initialize();
+if (location.hash) initialize();
 
   </script>
 </body>
