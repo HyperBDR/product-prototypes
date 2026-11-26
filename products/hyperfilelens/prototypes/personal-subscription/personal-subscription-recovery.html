@@ -1,0 +1,162 @@
+<!doctype html>
+<html lang="en">
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <meta name="robots" content="noindex, nofollow">
+  <title>HyperFileLens · Data Protection</title>
+  <style>
+    * { box-sizing: border-box; }
+    body { margin: 0; color: #252635; font: 14px/1.5 system-ui, sans-serif; background: #f6f7fb; }
+    main { max-width: 1440px; margin: auto; padding: 24px clamp(12px, 3vw, 40px); }
+    header { display: flex; align-items: baseline; justify-content: space-between; gap: 12px; flex-wrap: wrap; }
+    h1, h2, p { margin: 0 0 12px; }
+    h1 { font-size: 22px; }
+    h2 { font-size: 16px; }
+    a { color: #5142be; }
+    .steps { display: flex; flex-wrap: wrap; gap: 8px 24px; margin: 8px 0 16px; color: #626979; padding-inline-start: 24px; }
+    .steps [aria-current] { color: #5142be; font-weight: 650; }
+    .panel { background: white; border: 1px solid #e1e3ec; border-radius: 10px; padding: 16px; }
+    .toolbar { display: flex; align-items: center; gap: 10px; flex-wrap: wrap; margin-bottom: 12px; }
+    input, select, button { font: inherit; color: inherit; border: 1px solid #d8dbe6; border-radius: 6px; background: white; min-height: 34px; padding: 5px 10px; max-width: 100%; }
+    button:not(:disabled) { cursor: pointer; }
+    button:focus-visible, a:focus-visible { outline: 2px solid #6553df; outline-offset: 2px; }
+    button.primary { background: #6454da; border-color: #6454da; color: white; }
+    button:disabled { opacity: .55; }
+    .table { overflow: auto; }
+    table { border-collapse: collapse; width: 100%; white-space: nowrap; }
+    td, th { padding: 10px 12px; text-align: start; border-bottom: 1px solid #ececf2; }
+    th { background: #f7f8fb; color: #555e70; }
+    .online { color: #13754b; }
+    dialog { border: 1px solid #e1e3ec; padding: 20px; border-radius: 12px; width: min(520px, calc(100% - 24px)); color: inherit; }
+    dialog::backdrop { background: #26273b55; }
+    dialog.drawer { margin: 0 0 0 auto; height: 100%; max-height: 100%; border-radius: 0; }
+    dialog label { display: grid; gap: 4px; margin-block: 12px; }
+    dialog menu { display: flex; flex-wrap: wrap; gap: 8px; justify-content: flex-end; padding: 0; margin-block: 16px 0; }
+    .note { color: #586072; }
+    .snapshot { padding: 12px; border: 1px solid #e1e3ec; border-radius: 8px; margin-block: 12px; }
+    [hidden] { display: none !important; }
+  </style>
+</head>
+<body>
+  <main>
+    <header><h1 data-copy="title"></h1><a href="./index.html#/configuration/account/subscription" target="_parent" data-copy="subscription"></a></header>
+    <ol class="steps"><li data-copy="prepare"></li><li data-copy="configure"></li><li aria-current="step" data-copy="start"></li></ol>
+    <section class="panel" aria-labelledby="sources-heading">
+      <h2 id="sources-heading" data-copy="sources"></h2>
+      <div class="toolbar"><label for="search" data-copy="search"></label><input id="search" type="search" autocomplete="off"></div>
+      <div class="table"><table><thead><tr><th scope="col" data-copy="source"></th><th scope="col" data-copy="status"></th><th scope="col" data-copy="repository"></th><th scope="col" data-copy="latest"></th><th scope="col" data-copy="actions"></th></tr></thead><tbody></tbody></table></div>
+      <p id="empty" class="note" role="status" hidden></p>
+    </section>
+  </main>
+  <dialog id="detail" class="drawer" aria-labelledby="detail-title">
+    <form method="dialog"><header><h2 id="detail-title" data-copy="details"></h2><button data-copy="close"></button></header></form>
+    <p id="source-name"></p><p class="note" data-copy="repositoryName"></p>
+    <div class="snapshot"><h2 data-copy="latest"></h2><p>2026-11-01 18:00 UTC</p><p id="source-path"></p></div>
+    <button id="restore" class="primary" type="button" data-copy="restore"></button>
+    <p id="unavailable" class="note" data-copy="unavailable" hidden></p>
+  </dialog>
+  <dialog id="wizard" aria-labelledby="wizard-title">
+    <form id="restore-form">
+      <h2 id="wizard-title" data-copy="restore"></h2>
+      <div id="fields">
+        <label><span data-copy="point"></span><select><option>2026-11-01 18:00 UTC</option></select></label>
+        <label><span data-copy="target"></span><select name="target" required><option value="" data-copy="selectTarget"></option><option value="workstation">workstation</option></select></label>
+        <label><span data-copy="scope"></span><select name="scope"><option value="all" data-copy="all"></option><option value="folder" data-copy="folder"></option></select></label>
+        <label><span data-copy="destination"></span><input name="destination" required value="/tmp/restore"></label>
+        <p class="note" data-copy="skip"></p>
+      </div>
+      <div id="review" hidden><h2 data-copy="review"></h2><p id="review-settings"></p><p class="note" data-copy="mockOnly"></p></div>
+      <p id="completion" class="note" data-copy="notSubmitted" role="status" hidden></p>
+      <menu><button id="cancel" type="button" data-copy="close"></button><button id="edit" type="button" data-copy="back" hidden></button><button id="continue" type="submit" class="primary" data-copy="review"></button></menu>
+    </form>
+  </dialog>
+  <script>
+    const params = new URLSearchParams(location.search);
+    const chinese = params.get('lang') === 'zh';
+    const canRestore = ['open', 'soon', 'lastDay'].includes(params.get('stage'));
+    const sources = params.get('backups') === '1' ? ['documents', 'workstation'] : [];
+    const copy = {
+      title: ['Data Protection', '数据保护'], subscription: ['Back to Subscription', '返回订阅页'],
+      prepare: ['Prepare Backup Sources', '准备备份源'], configure: ['Configure Backups', '配置备份'], start: ['Start Backup', '开始备份'],
+      sources: ['Backup Sources', '备份源'], search: ['Search Backup Sources', '搜索备份源'], source: ['Backup Source', '备份源'],
+      status: ['Status', '状态'], online: ['Online', '在线'], repository: ['Repository', '备份仓库'], repositoryName: ['Managed Storage', '托管存储'],
+      latest: ['Latest Restorable Snapshot', '最近一次可恢复的快照'], actions: ['Actions', '操作'], details: ['Backup Source Details', '备份源详情'],
+      close: ['Close', '关闭'], restore: ['Restore Backup', '恢复备份'], unavailable: ['New Restore Tasks Aren’t Available.', '当前无法发起新的恢复任务。'],
+      empty: ['No Managed Backups to Restore.', '暂无可恢复的托管备份。'], noMatches: ['No Matching Backup Sources.', '没有匹配的备份源。'],
+      point: ['Restore Point', '恢复点'], target: ['Restore Target', '恢复目标'], selectTarget: ['Select a Target', '请选择目标节点'],
+      scope: ['Restore Scope', '恢复范围'], all: ['Entire Snapshot', '整个快照'], folder: ['Documents Folder', '文档目录'],
+      destination: ['Destination Folder', '目标目录'], skip: ['Existing Files with the Same Name Will Be Skipped.', '跳过同名文件，不覆盖目标目录中已有的文件。'],
+      review: ['Review Restore', '确认恢复信息'], back: ['Back', '返回'], submit: ['Start Restore', '开始恢复'],
+      mockOnly: ['This Preview Uses Sample Backup Data.', '此页面使用示例备份数据。'],
+      notSubmitted: ['No Restore Task Was Submitted.', '未提交实际恢复任务。'],
+    };
+    const text = key => copy[key][chinese ? 1 : 0];
+    const element = id => document.getElementById(id);
+    document.documentElement.lang = chinese ? 'zh-CN' : 'en';
+    document.title = `HyperFileLens · ${text('title')}`;
+    document.querySelectorAll('[data-copy]').forEach(node => { node.textContent = text(node.dataset.copy); });
+    let selectedSource = '';
+    let reviewing = false;
+    const detail = element('detail');
+    const wizard = element('wizard');
+    const form = element('restore-form');
+    function renderRows() {
+      const query = element('search').value.trim().toLowerCase();
+      const rows = sources.filter(source => source.includes(query));
+      document.querySelector('tbody').replaceChildren(...rows.map(source => {
+        const row = document.createElement('tr');
+        for (const value of [source, text('online'), text('repositoryName'), '2026-11-01 18:00 UTC']) row.insertCell().textContent = value;
+        row.cells[1].className = 'online';
+        const open = document.createElement('button');
+        open.type = 'button';
+        open.textContent = text('details');
+        open.addEventListener('click', () => {
+          selectedSource = source;
+          element('source-name').textContent = source;
+          element('source-path').textContent = `/srv/${source}`;
+          detail.showModal();
+        });
+        row.insertCell().append(open);
+        return row;
+      }));
+      element('empty').hidden = rows.length > 0;
+      element('empty').textContent = text(sources.length ? 'noMatches' : 'empty');
+    }
+    function setReview(value) {
+      reviewing = value;
+      element('fields').hidden = value;
+      element('review').hidden = !value;
+      element('edit').hidden = !value;
+      element('continue').hidden = false;
+      element('continue').textContent = text(value ? 'submit' : 'review');
+      element('completion').hidden = true;
+    }
+    element('search').addEventListener('input', renderRows);
+    element('restore').hidden = !canRestore;
+    element('unavailable').hidden = canRestore;
+    element('restore').addEventListener('click', () => {
+      if (!canRestore || !selectedSource) return;
+      form.reset();
+      setReview(false);
+      wizard.showModal();
+    });
+    element('cancel').addEventListener('click', () => wizard.close());
+    element('edit').addEventListener('click', () => setReview(false));
+    form.addEventListener('submit', event => {
+      event.preventDefault();
+      if (!canRestore) return;
+      if (reviewing) {
+        element('completion').hidden = false;
+        element('continue').hidden = true;
+        element('edit').hidden = true;
+        return;
+      }
+      const fields = new FormData(form);
+      element('review-settings').textContent = [selectedSource, fields.get('target'), text(fields.get('scope')), fields.get('destination')].join(' · ');
+      setReview(true);
+    });
+    renderRows();
+  </script>
+</body>
+</html>
