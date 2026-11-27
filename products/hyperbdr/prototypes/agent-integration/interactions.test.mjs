@@ -36,19 +36,19 @@ test('new tokens store only a masked prefix and use GMT+08 timestamps',()=>{cons
 function uiSetup(access=false,beforeStartup=''){
  const handlers={},nodes=new Map();let document;
  function element(id){if(!nodes.has(id))nodes.set(id,{id,hidden:['create','created','confirm','toast','auditDetail','tokenMoreMenu','promptTokenDropdown','promptTokenNoMatch','promptTokenClear'].includes(id),value:id==='days'?'30':'',textContent:'',innerHTML:'',disabled:false,isConnected:true,dataset:{},style:{},attributes:{},setAttribute(name,value){this.attributes[name]=String(value);},classList:{values:new Set(),toggle(name,force){const on=force===undefined?!this.values.has(name):force;on?this.values.add(name):this.values.delete(name);return on;},contains(name){return this.values.has(name);}},focus(){document.activeElement=this;},click(){if(this.onclick)this.onclick({});},querySelector(){return element('confirmationCancel');},querySelectorAll(){return[];},getClientRects(){return[{}];}});return nodes.get(id);}
- const fake={querySelector:()=>({querySelector:()=>element('fake'),querySelectorAll:()=>[],innerHTML:'',textContent:''}),querySelectorAll:()=>[]};document={getElementById:element,querySelector:()=>fake,querySelectorAll:()=>[],documentElement:{},body:{style:{}},activeElement:null,addEventListener(type,fn){handlers[type]=fn;}};
+ const fake={querySelector:()=>({querySelector:()=>element('fake'),querySelectorAll:()=>[],innerHTML:'',textContent:''}),querySelectorAll:()=>[]};document={getElementById:element,querySelector:()=>fake,querySelectorAll:()=>[],documentElement:{},body:{style:{}},activeElement:null,addEventListener(type,fn){const previous=handlers[type];handlers[type]=previous?e=>{previous(e);fn(e);}:fn;}};
  const context=vm.createContext({window:{__TEST__:true,addEventListener(){},AGENT_MESSAGES:{zh:{statuses:{active:'active',disabled:'disabled',expired:'expired'},confirmDisableAllLead:'{n}',confirmDisableLead:'{name}',confirmEnableLead:'{name}',confirmDeleteLead:'{name}',confirmDisableBody:'body',confirmEnableBody:'body',confirmDisableNote:'note',confirmEnableNote:'note',confirmDeleteBody:'body',confirmDeleteNote:'danger',confirmCreateLead:'policy',confirmCreateBody:'body',confirmCreateNote:'note',name:'Name',expiry:'Expiration',expiryAt:'Expiration',actions:{enable:'enable',disable:'disable',delete:'delete',cannotEnable:'cannotEnable'},count:(n,a)=>String(n)},en:{statuses:{active:'active',disabled:'disabled',expired:'expired'},confirmDisableAllLead:'{n}',confirmDisableLead:'{name}',confirmEnableLead:'{name}',confirmDeleteLead:'{name}',confirmDisableBody:'body',confirmEnableBody:'body',confirmDisableNote:'note',confirmEnableNote:'note',confirmDeleteBody:'body',confirmDeleteNote:'danger',confirmCreateLead:'policy',confirmCreateBody:'body',confirmCreateNote:'note',name:'Name',expiry:'Expiration',expiryAt:'Expiration',actions:{enable:'enable',disable:'disable',delete:'delete',cannotEnable:'cannotEnable'},count:(n,a)=>String(n)}},AgentI18n:{language:'zh',t:(k)=>k,toggle(){}}},document,Date:class extends Date{constructor(...args){super(...(args.length?args:[referenceNow]));}static now(){return referenceNow;}},Uint8Array,crypto:{getRandomValues(arr){arr.fill(13);return arr;}},navigator:{clipboard:{writeText:async()=>{}}},setTimeout(){return 1;},clearTimeout(){},setInterval(){}});
  const dictionary=vm.createContext({window:{}});vm.runInContext(readFileSync(path.join(dir,'translations.js'),'utf8'),dictionary);for(const language of ['zh','en'])context.window.AGENT_MESSAGES[language].list=dictionary.window.AGENT_MESSAGES[language].list;
  vm.runInContext(script.replace('const store=new TokenStore(),$=id=>document.getElementById(id);','const store=new TokenStore(),$=id=>document.getElementById(id);'+beforeStartup),context);if(access)vm.runInContext(readFileSync(path.join(dir,'translations.js'),'utf8'),context);
  const click=(attr,id)=>handlers.click({target:{closest(selector){if(selector===attr)return{id,disabled:false,dataset:attr==='[data-prompt-token]'?{promptToken:id}:attr==='[data-token-page]'?{tokenPage:id}:attr==='[data-audit-page]'?{auditPage:id}:attr==='[data-audit-detail]'?{auditDetail:id}:attr==='[data-close]'?{close:id}:attr==='[data-toggle]'?{toggle:id}:{delete:id}};return null;}}});
  const selectToken=(id,checked)=>handlers.change({target:{closest:selector=>selector==='[data-token-select]'?{checked,dataset:{tokenSelect:String(id)}}:null}});
- return{element,context,click,selectToken,key:e=>handlers.keydown({...e,preventDefault(){}})};
+ return{element,context,click,selectToken,dispatchClick:target=>handlers.click({target}),key:e=>handlers.keydown({...e,preventDefault(){}})};
 }
 test('disable and delete require confirmation; cancel does not mutate rows',()=>{const {element,click}=uiSetup();const before=element('rows').innerHTML;click('[data-toggle]',1);assert.equal(element('confirm').hidden,false);assert.match(element('confirmCopy').innerHTML,/production-cli/);assert.equal(element('rows').innerHTML,before);click('[data-close]','confirm');assert.equal(element('rows').innerHTML,before);element('confirmOk').onclick();assert.equal(element('rows').innerHTML,before);click('[data-toggle]',1);element('confirmOk').onclick();assert.match(element('rows').innerHTML,/<td class="disabled">/);const after=element('rows').innerHTML;click('[data-delete]',1);assert.match(element('confirmCopy').innerHTML,/danger/);assert.equal(element('rows').innerHTML,after);element('confirmOk').onclick();assert.ok(!element('rows').innerHTML.includes('production-cli'));});
 test('create confirmation previews policy, cancellation preserves draft, and raw token is cleared on closing',()=>{const {element,click,key}=uiSetup();element('new').onclick();element('name').value='Agent';element('desc').value='description';element('days').value='30';const before=element('rows').innerHTML;element('submit').onclick();assert.match(element('confirmCopy').innerHTML,/30 天/);assert.match(element('confirmCopy').innerHTML,/2026-12-17 12:00:00/);key({key:'Escape'});assert.equal(element('confirm').hidden,true);assert.equal(element('create').hidden,false);assert.equal(element('name').value,'Agent');assert.equal(element('rows').innerHTML,before);element('submit').onclick();element('confirmOk').onclick();assert.equal(element('created').hidden,false);const raw=element('outToken').textContent;assert.ok(raw.startsWith('sl_agent_'));assert.equal(raw.length,73);assert.ok(!element('rows').innerHTML.includes(raw));click('[data-close]','created');assert.equal(element('outToken').textContent,'');});
 test('bulk disable cancellation and empty-list rendering are safe',()=>{const {element,click}=uiSetup();const before=element('rows').innerHTML;element('all').onclick();assert.match(element('confirmCopy').innerHTML,/2/);click('[data-close]','confirm');assert.equal(element('rows').innerHTML,before);for(const id of [1,2,3,4]){click('[data-delete]',id);element('confirmOk').onclick();}assert.match(element('rows').innerHTML,/暂无符合条件的令牌/);assert.equal(element('all').disabled,true);});
 
-test('token table omits the recent-use column',()=>{assert.doesNotMatch(html,/最近使用/);assert.doesNotMatch(html,/t\.u/);});
+test('token table omits the recent-use column',()=>{assert.doesNotMatch(html,/最近使用/);assert.doesNotMatch(html.slice(html.indexOf('function renderTokens()'),html.indexOf('function renderTokenLanguage()')),/\bt\.u\b/);});
 
 test('bilingual assets and language sources are wired',()=>{assert.match(html,/translations\.js/);assert.match(html,/i18n\.js/);assert.ok(existsSync(path.join(dir,'translations.js')));assert.ok(existsSync(path.join(dir,'i18n.js')));const messages=readFileSync(path.join(dir,'translations.js'),'utf8');assert.match(messages,/Global Settings/);assert.match(messages,/language:/);assert.match(messages,/Agent Integration/);assert.match(messages,/全局设置/);});
 test('English copy covers confirmation and token action vocabulary',()=>{const messages=readFileSync(path.join(dir,'translations.js'),'utf8');for(const text of ['Confirm Access Token Creation','Confirm Disable Token','Confirm Enable Token','Confirm Delete Token','Enable','Disable','Delete','Token shown only once'])assert.ok(messages.includes(text),text);});
@@ -181,12 +181,12 @@ test('creation and explanatory copy consistently call the credential an access t
 });
 
 
-test('integration uses the requested title, prominent labels and a default eligible token in the searchable combobox',()=>{
+test('integration uses the requested title, newmuse form labels and a default eligible token in the searchable combobox',()=>{
  const c=vm.createContext({window:{}});vm.runInContext(readFileSync(path.join(dir,'translations.js'),'utf8'),c);
  assert.equal(c.window.AGENT_MESSAGES.zh.promptTitle,'生成智能体安装提示词');assert.equal(c.window.AGENT_MESSAGES.en.promptSelect,'Please Select');
  assert.doesNotMatch(html,/生成 Agent 安装提示词|<select id="promptToken"/);
  assert.match(html,/id="promptToken"[^>]*role="combobox"[^>]*aria-autocomplete="list"/);
- assert.match(html,/#promptTokenLabel,\.prompt-result-label\{[^}]*font-weight:700;color:#262626/);
+ assert.match(html,/#promptTokenLabel,\.prompt-result-label\{[^}]*font-weight:400;color:#595959/);
  const {element}=uiSetup(true);element('promptToken').onfocus();assert.equal(element('promptToken').value,'');assert.match(element('promptToken').placeholder,/production-cli/);assert.equal(element('generatePrompt').disabled,false);assert.match(element('promptTokenOptions').innerHTML,/production-cli|staging-agent/);assert.doesNotMatch(element('promptTokenOptions').innerHTML,/old-macbook|temporary-test/);
 });
 
@@ -225,92 +225,6 @@ test('reopening, searching and reselecting never disable a valid committed token
  // Committing a different valid option changes the token, but not button availability.
  input.onfocus();input.value='stag';input.oninput();click('[data-prompt-token]',2);assert.equal(element('generatePrompt').disabled,false);assert.doesNotMatch(element('promptOutput').innerHTML,/npx hyperbdr/);element('generatePrompt').onclick();assert.match(element('promptOutput').innerHTML,/--api-key sl_agent_8vJq/);
  element('promptTokenClear').onclick();assert.equal(element('generatePrompt').disabled,true);assert.doesNotMatch(element('promptOutput').innerHTML,/npx hyperbdr/);
-});
-
-
-test('agent usage examples follow the prompt card and describe customer tasks rather than installation steps',()=>{
- const start=html.indexOf('<section class="card agent-usage"');
- const end=html.indexOf('<div id="tokenPage"',start);
- const section=html.slice(start,end);
- assert.ok(start>html.indexOf('id="promptNote"'));
- assert.ok(end>start);
- assert.match(section,/aria-labelledby="agentUsageTitle"/);
- assert.match(section,/您可以这样使用智能体/);
- assert.equal((section.match(/<h3 id="agentUsageTitle[1-6]"/g)||[]).length,6);
- assert.equal((section.match(/class="agent-usage-prompts" id="agentUsagePrompt[1-6]"/g)||[]).length,6);
- for(const title of ['创建源端','创建目标端','启动配置','数据同步','演练启动','资源清理'])assert.ok(section.includes(title));
- assert.match(section,/待我确认后再操作/);
- assert.match(section,/<ol class="agent-usage-flow">/);
- assert.equal((section.match(/class="agent-usage-arrow"/g)||[]).length,5);
- assert.doesNotMatch(section,/<button|aria-current|aria-valuenow/);
- assert.doesNotMatch(section,/npx |hyperbdrctl|安装 skills|使用指南|sl_agent_/);
- assert.ok(html.includes('const m=L();renderAgentUsage();'));
-});
-
-test('usage copy has matching bilingual fields and keeps confirmation and network requirements',()=>{
- const c=vm.createContext({window:{}});vm.runInContext(readFileSync(path.join(dir,'translations.js'),'utf8'),c);
- const {zh,en}=c.window.AGENT_MESSAGES;
- assert.deepEqual(Object.keys(zh.usage).sort(),Object.keys(en.usage).sort());
- for(const lang of [zh,en]){assert.equal(lang.usage.examples.length,6);for(const example of lang.usage.examples)assert.deepEqual(Object.keys(example).sort(),['detail','prompts','title']);}
- for(const example of zh.usage.examples)assert.match(example.prompts.join(''),/待我确认后/);
- for(const example of en.usage.examples)assert.match(example.prompts.join(' '),/wait for my confirmation/i);
- assert.match(zh.usage.reminder,/说明影响.*确认执行/);
- assert.match(en.usage.reminder,/impact before confirming/);
- assert.match(zh.usage.networkBefore,/智能体运行环境.*HTTPS/);
- assert.match(en.usage.networkBefore,/agent runtime.*HTTPS/);
-});
-
-test('usage renderer switches languages with safe text output and shares the installation service domain',()=>{
- const dictionary=vm.createContext({window:{}});vm.runInContext(readFileSync(path.join(dir,'translations.js'),'utf8'),dictionary);
- const nodes=new Map(),element=id=>{if(!nodes.has(id))nodes.set(id,{textContent:''});return nodes.get(id);};
- const c=vm.createContext({window:{AgentI18n:{language:'zh'}},$:element,L:()=>dictionary.window.AGENT_MESSAGES[c.window.AgentI18n.language],text:(node,value)=>{node.textContent=value;}});
- const constant=script.match(/const AGENT_SERVICE_URL='[^']+';/)[0];
- const renderer=script.match(/function renderAgentUsage\(\)\{[\s\S]*?\n\}/)[0];
- vm.runInContext(constant+renderer+';renderAgentUsage();',c);
- assert.equal(element('agentUsageTitle').textContent,'您可以这样使用智能体');
- assert.match(element('agentUsagePrompt1Line1').textContent,/选择 Agent 或 Agentless/);
- assert.equal(element('agentUsageDetail1').textContent,'Agent / Agentless');
- assert.equal(element('agentUsageTitle6').textContent,'资源清理');
- assert.equal(element('agentUsageFlowTitle').textContent,'参考操作流程');
- assert.equal(element('agentUsageDomain').textContent,'hyperbdr.com');
- c.window.AgentI18n.language='en';vm.runInContext('renderAgentUsage()',c);
- assert.equal(element('agentUsageTitle').textContent,'Ways to use your agent');
- assert.match(element('agentUsagePrompt2Line1').textContent,/Alibaba Cloud/);
- assert.equal(element('agentUsageTitle6').textContent,'Clean up resources');
- assert.equal(element('agentUsagePromptLabel').textContent,'Example prompts');
- dictionary.window.AGENT_MESSAGES.en.usage.examples[0].prompts[0]='<img src=x onerror=alert(1)>';
- vm.runInContext('renderAgentUsage()',c);assert.match(element('agentUsagePrompt1Line1').textContent,/<img src=x/);
- assert.ok(script.includes('install --url ${AGENT_SERVICE_URL} --api-key'));
-});
-
-
-test('workflow copy follows source, target, boot configuration, sync, drill and cleanup in both languages',()=>{
- const c=vm.createContext({window:{}});vm.runInContext(readFileSync(path.join(dir,'translations.js'),'utf8'),c);
- const {zh,en}=c.window.AGENT_MESSAGES;
- assert.deepEqual(Array.from(zh.usage.examples,e=>e.title),['创建源端','创建目标端','启动配置','数据同步','演练启动','资源清理']);
- assert.deepEqual(Array.from(en.usage.examples,e=>e.title),['Set up source','Set up target','Boot configuration','Data sync','Start DR drill','Clean up resources']);
- assert.equal(zh.usage.examples[0].detail,'Agent / Agentless');
- assert.match(zh.usage.examples[1].detail,/启动到哪个云/);
- assert.match(zh.usage.examples[5].prompts.join(''),/依赖关系.*清理范围和影响.*保留仍在使用/);
- assert.match(en.usage.examples[5].prompts.join(' '),/dependencies.*scope and impact.*still in use/);
- assert.match(zh.usage.intro,/提示词示例.*实际环境/);
- assert.ok(html.includes('grid-template-columns:var(--usage-stage-width) minmax(0,1fr)'));
- assert.match(html,/@media\(max-width:640px\)\{\.agent-usage-flow-head/);
-});
-
-
-test('workflow has no visible numbering or quotation wrappers and offers multiple plain-language prompt lines',()=>{
- const start=html.indexOf('<section class="card agent-usage"');const section=html.slice(start,html.indexOf('</section>',start));
- assert.doesNotMatch(section,/agent-usage-order|<blockquote|[“”「」‘’]/);
- assert.equal((section.match(/id="agentUsagePrompt[1-6]Line[12]"/g)||[]).length,12);
- assert.match(html,/\.agent-usage-flow\{list-style:none/);
- assert.match(html,/\.agent-usage-prompts p\+p\{margin-top:8px/);
- const c=vm.createContext({window:{}});vm.runInContext(readFileSync(path.join(dir,'translations.js'),'utf8'),c);
- for(const lang of ['zh','en'])for(const example of c.window.AGENT_MESSAGES[lang].usage.examples){
-  assert.equal(example.prompts.length,2);
-  for(const line of example.prompts){assert.ok(line.trim().length>0);assert.doesNotMatch(line,/[“”「」‘’]/);}
- }
- assert.ok(script.includes("'Line'+(line+1)),prompt)"));
 });
 
 
@@ -363,12 +277,155 @@ test('startup without eligible tokens stays empty and explicit clear never resel
 });
 
 
-test('workflow alignment shares column widths, aligns first text lines and centers connecting arrows',()=>{
- assert.match(html,/\.agent-usage-content\{--usage-stage-width:176px/);
- assert.equal((html.match(/grid-template-columns:var\(--usage-stage-width\) minmax\(0,1fr\)/g)||[]).length,2);
- assert.match(html,/\.agent-usage-flow-head>span:first-child\{padding-left:17px/);
- assert.match(html,/\.agent-usage-stage\{[^}]*justify-content:flex-start;[^}]*padding:12px 16px;border:1px/);
- assert.match(html,/\.agent-usage-prompts\{align-self:stretch;min-width:0;padding:13px 0/);
- assert.match(html,/\.agent-usage-arrow\{[^}]*left:calc\(var\(--usage-stage-width\)\/2 - 6px\)/);
- assert.match(html,/@media\(max-width:900px\)\{\.agent-usage-content\{--usage-stage-width:144px/);
+
+function usageSetup(){
+ const dictionary=vm.createContext({window:{}});vm.runInContext(readFileSync(path.join(dir,'translations.js'),'utf8'),dictionary);
+ const nodes=new Map(),element=id=>{if(!nodes.has(id))nodes.set(id,{id,textContent:'',innerHTML:'',dataset:{},attributes:{},setAttribute(k,v){this.attributes[k]=String(v);}});return nodes.get(id);};
+ let focused='';const tabs=['setup','license','workflow','operations'].map(id=>({dataset:{usageCat:id},focus(){focused=id;}}));
+ const c=vm.createContext({window:{AgentI18n:{language:'zh'}},$:element,document:{querySelector:s=>tabs.find(t=>s==='[data-usage-cat="'+t.dataset.usageCat+'"]'),querySelectorAll:()=>tabs},L:()=>dictionary.window.AGENT_MESSAGES[c.window.AgentI18n.language],text:(node,value)=>{node.textContent=value;},esc:v=>String(v??'').replace(/[&<>"']/g,ch=>({'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;',"'":'&#39;'}[ch])),setTimeout(){return 1;},clearTimeout(){}});
+ const logic=script.slice(script.indexOf('const COPY_ICON_SVG'),script.indexOf('function buildAgentPrompt'));
+ vm.runInContext(script.match(/const AGENT_SERVICE_URL='[^']+';/)[0]+logic+';renderAgentUsage();',c);
+ return{element,context:c,dictionary,focused:()=>focused};
+}
+
+test('reference usage layout stays below installation prompt and contains quick start, scenario cards and footer',()=>{
+ const start=html.indexOf('<section class="card agent-usage"'),end=html.indexOf('</section>',start);const section=html.slice(start,end);
+ assert.ok(start>html.indexOf('id="promptNote"'));assert.ok(end<html.indexOf('<div id="tokenPage"'));
+ for(const id of ['agentUsageTitle','agentUsageIntro','agentUsageHowTitle','agentUsageHowSteps','agentUsageCategoryTabs','agentUsageScenariosGrid','agentUsageReminder','agentUsageDomain','usageCopyDomain'])assert.ok(section.includes('id="'+id+'"'),id);
+ assert.match(section,/role="tablist"/);assert.match(section,/role="tabpanel"/);
+ assert.match(html,/\.agent-usage-how-steps\{[^}]*grid-template-columns:repeat\(3,minmax\(0,1fr\)\)/);
+ assert.match(html,/\.agent-usage-scenarios-grid\{[^}]*grid-template-columns:minmax\(0,1fr\)/);
+ assert.match(html,/@media\(max-width:1024px\)/);
+ assert.doesNotMatch(section,/agent-usage-flow|agent-usage-order|<blockquote/);
+ assert.doesNotMatch(script,/class="agent-usage-scenario-num"/);
+});
+
+test('reference usage copy has matching bilingual contracts and all expected scenario prompts',()=>{
+ const {dictionary}=usageSetup(),{zh,en}=dictionary.window.AGENT_MESSAGES;
+ assert.deepEqual(Object.keys(zh.usage).sort(),Object.keys(en.usage).sort());assert.deepEqual(Object.keys(zh.usageUi).sort(),Object.keys(en.usageUi).sort());
+ for(const m of [zh,en]){assert.equal(m.usage.steps.length,3);assert.equal(m.usage.scenarios.length,4);for(const s of m.usage.scenarios){assert.equal(s.prompts.length,3);assert.deepEqual(Object.keys(s).sort(),['id','outcome','prompts','subtitle','title']);}}
+ const prompts=Array.from(zh.usage.scenarios).flatMap(s=>Array.from(s.prompts));
+ for(const p of ['我如何安装智能体','我如何添加授权','我要将 VMware 虚拟机容灾到华为云，请引导我完成流程'])assert.ok(prompts.includes(p));
+ assert.match(zh.usage.reminder,/影响.*确认执行/);assert.match(zh.usage.networkBefore,/智能体运行环境.*HTTPS/);
+});
+
+test('usage rendering defaults to Install and Connect with four tabs and one full-width card',()=>{
+ const {element}=usageSetup();assert.equal(element('agentUsageTitle').textContent,'您可以这样使用智能体');
+ assert.equal((element('agentUsageHowSteps').innerHTML.match(/class="agent-usage-how-step"/g)||[]).length,3);
+ assert.equal((element('agentUsageScenariosGrid').innerHTML.match(/class="agent-usage-scenario"/g)||[]).length,1);
+ assert.equal((element('agentUsageScenariosGrid').innerHTML.match(/data-usage-copy-prompt=/g)||[]).length,3);
+ assert.equal(element('agentUsageDomain').textContent,'hyperbdr.com');
+ assert.equal(element('usageCopyDomain').attributes['aria-label'],'复制服务地址');
+
+});
+
+test('language switch preserves active scenario and escapes translated titles, prompt text and attributes',()=>{
+ const {element,context,dictionary}=usageSetup();context.window.AgentI18n.language='en';vm.runInContext('renderAgentUsage()',context);
+ assert.equal(element('agentUsageTitle').textContent,dictionary.window.AGENT_MESSAGES.en.usage.title);assert.match(element('agentUsageScenariosGrid').innerHTML,/data-scenario-id="setup"/);assert.equal((element('agentUsageScenariosGrid').innerHTML.match(/class="agent-usage-scenario"/g)||[]).length,1);
+ dictionary.window.AGENT_MESSAGES.en.usage.scenarios[0].title='<img src=x onerror=alert(1)>';
+ dictionary.window.AGENT_MESSAGES.en.usage.scenarios[0].prompts[0]='<img src=x>" autofocus onfocus="alert(1)';vm.runInContext('renderAgentUsage()',context);
+ assert.doesNotMatch(element('agentUsageScenariosGrid').innerHTML,/<img|aria-label="[^"]*" autofocus/);assert.match(element('agentUsageScenariosGrid').innerHTML,/&lt;img/);assert.match(element('agentUsageScenariosGrid').innerHTML,/&quot;/);
+});
+
+test('copying a usage example copies only that prompt and reports success after clipboard completion',async()=>{
+ const ui=uiSetup(true),writes=[];let resolveWrite;
+ ui.context.navigator.clipboard.writeText=value=>{writes.push(value);return new Promise(resolve=>{resolveWrite=resolve;});};
+ const label={textContent:'复制'},classes=new Set(),button={dataset:{usageCopyPrompt:'workflow:0'},querySelector:()=>label,classList:{add:s=>classes.add(s),remove:s=>classes.delete(s)}};
+ ui.dispatchClick({closest:s=>s==='[data-usage-copy-prompt]'?button:null});assert.equal(label.textContent,'复制');assert.equal(classes.size,0);
+ assert.equal(writes[0],'我要将 VMware 虚拟机容灾到华为云，请引导我完成流程');assert.doesNotMatch(writes[0],/sl_agent_|--api-key/);
+ resolveWrite();await new Promise(resolve=>setImmediate(resolve));assert.equal(label.textContent,'已复制');assert.equal(classes.has('is-copied'),true);assert.equal(ui.element('toast').dataset.type,'success');
+});
+
+test('usage clipboard failures never show copied state; domain copy uses the installation service URL',async()=>{
+ const ui=uiSetup(true);ui.context.navigator.clipboard.writeText=async()=>{throw Error('denied');};
+ const label={textContent:'复制'},classes=new Set(),button={dataset:{usageCopyPrompt:'setup:0'},querySelector:()=>label,classList:{add:s=>classes.add(s),remove:s=>classes.delete(s)}};
+ ui.dispatchClick({closest:s=>s==='[data-usage-copy-prompt]'?button:null});await new Promise(resolve=>setImmediate(resolve));assert.equal(label.textContent,'复制');assert.equal(classes.size,0);assert.equal(ui.element('toast').dataset.type,'error');
+ let value;ui.context.navigator.clipboard.writeText=async text=>{value=text;};const domain={classList:{add(){},remove(){}}};ui.dispatchClick({closest:s=>s==='#usageCopyDomain'?domain:null});await new Promise(resolve=>setImmediate(resolve));assert.equal(value,'https://hyperbdr.com');
+});
+
+
+
+test('agent page retains fluid width and only the four requested scenario tabs',()=>{
+ for(const selector of ['.prompt-controls','.prompt-output','.prompt-note','.agent-usage-content']){
+  const declaration=html.slice(html.indexOf(selector+'{')).split('}')[0];assert.doesNotMatch(declaration,/max-width:\d+px/);
+ }
+ assert.match(html,/\.agent-usage-content\{width:100%;min-width:0\}/);
+ const {element,context,focused}=usageSetup();
+ assert.equal((element('agentUsageCategoryTabs').innerHTML.match(/role="tab"/g)||[]).length,4);
+ assert.doesNotMatch(element('agentUsageCategoryTabs').innerHTML,/全部场景|usageCatTab-all|data-usage-cat="all"/);
+ for(const category of ['setup','license','workflow','operations']){
+  vm.runInContext("selectUsageCategory('"+category+"',true)",context);
+  assert.equal(focused(),category);assert.match(element('agentUsageScenariosGrid').innerHTML,new RegExp('data-scenario-id="'+category+'"'));
+  assert.equal((element('agentUsageScenariosGrid').innerHTML.match(/data-scenario-id=/g)||[]).length,1);
+  assert.equal((element('agentUsageScenariosGrid').innerHTML.match(/data-usage-copy-prompt=/g)||[]).length,3);
+  assert.equal(element('agentUsageScenariosGrid').attributes['aria-labelledby'],'usageCatTab-'+category);
+ }
+ context.window.AgentI18n.language='en';vm.runInContext('renderAgentUsage()',context);
+ assert.match(element('agentUsageScenariosGrid').innerHTML,/data-scenario-id="operations"/);
+ vm.runInContext("selectUsageCategory('all')",context);assert.match(element('agentUsageScenariosGrid').innerHTML,/data-scenario-id="setup"/);
+});
+
+test('four-tab keyboard navigation cycles without an All category',()=>{
+ const ui=uiSetup(true),ids=['setup','license','workflow','operations'];const tabs=ids.map(id=>({dataset:{usageCat:id},focus(){}}));
+ ui.context.document.querySelectorAll=()=>tabs;ui.context.document.querySelector=s=>tabs.find(t=>s==='[data-usage-cat="'+t.dataset.usageCat+'"]');
+ for(const [from,key,to] of [['setup','ArrowLeft','operations'],['operations','ArrowRight','setup'],['setup','End','operations'],['operations','Home','setup'],['setup','ArrowDown','license'],['license','ArrowUp','setup']]){
+  ui.key({key,target:{closest:s=>s==='[data-usage-cat]'?tabs[ids.indexOf(from)]:null}});
+  assert.match(ui.element('agentUsageCategoryTabs').innerHTML,new RegExp('id="usageCatTab-'+to+'"[^>]*aria-selected="true"'));
+ }
+});
+
+
+test('scenario tabs sit below the direct-question heading and stay left aligned on desktop',()=>{
+ assert.match(html,/\.agent-usage-scenarios-head\{display:flex;flex-direction:column;align-items:flex-start;gap:16px;margin-bottom:16px\}/);
+ const start=html.indexOf('<div class="agent-usage-scenarios-head">');const end=html.indexOf('<div class="agent-usage-scenarios-grid"',start);const head=html.slice(start,end);
+ assert.ok(head.indexOf('id="agentUsageScenariosTitle"')<head.indexOf('id="agentUsageCategoryTabs"'));
+});
+
+
+test('usage reminder and connection requirement stack vertically at every screen width',()=>{
+ assert.match(html,/\.agent-usage-footer\{display:grid;grid-template-columns:minmax\(0,1fr\);gap:16px/);
+ const start=html.indexOf('<div class="agent-usage-footer">');const end=html.indexOf('</section>',start);const footer=html.slice(start,end);
+ assert.ok(footer.indexOf('id="agentUsageReminder"')<footer.indexOf('id="agentUsageNetworkTitle"'));
+});
+
+
+test('agent page adopts newmuse neutral palette, 14px body and 12px assistance without reference-only blue shades',()=>{
+ const styles=html.slice(html.indexOf('/* newmuse visual alignment:'),html.indexOf('/* Lists:'));
+ assert.match(styles,/#agentPage\{--agent-surface:#f5f5f5;--agent-surface-light:#fafafa;--agent-divider:#e3e3e3;--agent-border:#d9d9d9;--agent-title:#262626;--agent-body:#595959/);
+ assert.match(styles,/\.agent-usage-prompt-text\{[^}]*font:400 14px\/22px var\(--font\);color:var\(--agent-body\)/);
+ assert.match(styles,/\.agent-usage-header p\{[^}]*font:12px\/20px var\(--font\)/);
+ assert.match(styles,/\.agent-usage-scenario-head\{padding:16px;background:var\(--agent-surface\)/);
+ assert.doesNotMatch(styles,/#e2e8f0|#f7f9fc|#e6ebf1|#3d444d|#4a6b8c|#f0f6fc|#fdfaf4/);
+});
+
+test('usage scene controls use newmuse underline tabs and standard compact buttons',()=>{
+ const styles=html.slice(html.indexOf('/* newmuse visual alignment:'),html.indexOf('/* Lists:'));
+ assert.match(styles,/\.agent-usage-category-tabs\{[^}]*width:100%;[^}]*border-bottom:1px solid var\(--agent-divider\)/);
+ assert.match(styles,/\.usage-cat-btn\{height:38px;padding:7px 16px;[^}]*border-bottom:2px solid transparent;[^}]*font:400 14px\/22px var\(--font\)/);
+ assert.match(styles,/\.usage-cat-btn\[aria-selected="true"\]\{[^}]*border-bottom-color:var\(--p\);font-weight:400;box-shadow:none/);
+ assert.match(styles,/\.usage-copy-prompt-btn\{[^}]*height:32px;padding:0 12px;[^}]*border:1px solid var\(--agent-border\);border-radius:2px/);
+ assert.match(styles,/\.agent-usage-callout\{[^}]*padding:8px 16px;border-radius:4px/);
+ assert.match(styles,/\.agent-usage-callout-reminder\{background:var\(--agent-warning-bg\);border:1px solid var\(--warn\)/);
+});
+
+
+test('direct question heading has no changing scenario or prompt-count summary',()=>{
+ assert.doesNotMatch(html,/agentUsageScenariosMeta|agent-usage-section-meta|summarySingle|totalPrompts/);
+ const start=html.indexOf('<div class="agent-usage-scenarios-title-group">');const end=html.indexOf('</div>',start);
+ const heading=html.slice(start,end);assert.match(heading,/id="agentUsageScenariosTitle"/);assert.equal((heading.match(/<span/g)||[]).length,1);
+ const {element,context}=usageSetup();for(const id of ['setup','license','workflow','operations']){vm.runInContext("selectUsageCategory('"+id+"')",context);assert.match(element('agentUsageScenariosGrid').innerHTML,new RegExp('data-scenario-id="'+id+'"'));}
+});
+
+
+test('quick start restores reference 01, 02 and 03 badges in both languages without numbering scenario cards',()=>{
+ const {element,context}=usageSetup();
+ for(const language of ['zh','en']){
+  context.window.AgentI18n.language=language;vm.runInContext('renderAgentUsage()',context);
+  const steps=element('agentUsageHowSteps').innerHTML;
+  assert.deepEqual(Array.from(steps.matchAll(/class="agent-usage-step-num" aria-hidden="true">(\d+)<\/span>/g),m=>m[1]),['01','02','03']);
+  assert.equal((steps.match(/<h3>/g)||[]).length,3);
+  assert.doesNotMatch(element('agentUsageScenariosGrid').innerHTML,/agent-usage-step-num|agent-usage-scenario-num/);
+ }
+ assert.match(html,/\.agent-usage-how-step-top\{display:flex;align-items:center;gap:8px/);
+ assert.match(html,/\.agent-usage-step-num\{[^}]*min-width:22px;height:20px;[^}]*font-variant-numeric:tabular-nums/);
 });
