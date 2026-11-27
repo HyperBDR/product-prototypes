@@ -1,7 +1,7 @@
 {
   "id": "agent-integration",
-  "name": "HyperBDR 智能体集成",
-  "description": "HyperBDR 智能体集成原型，包含 Agent 安装提示词生成、访问令牌管理与访问审计日志。",
+  "name": "HyperBDR Agent Integration",
+  "description": "HyperBDR agent integration prototype featuring agent setup prompt generation, access token management, and access audit logs.",
   "status": "draft",
   "owner": "",
   "tags": [
