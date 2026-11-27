@@ -412,7 +412,7 @@ test('usage scene controls use newmuse underline tabs and standard compact butto
 test('direct question heading has no changing scenario or prompt-count summary',()=>{
  assert.doesNotMatch(html,/agentUsageScenariosMeta|agent-usage-section-meta|summarySingle|totalPrompts/);
  const start=html.indexOf('<div class="agent-usage-scenarios-title-group">');const end=html.indexOf('</div>',start);
- const heading=html.slice(start,end);assert.match(heading,/id="agentUsageScenariosTitle"/);assert.equal((heading.match(/<span/g)||[]).length,1);
+ const heading=html.slice(start,end);assert.match(heading,/id="agentUsageScenariosTitle"/);assert.equal((heading.match(/<h3/g)||[]).length,1);assert.doesNotMatch(heading,/<span/);
  const {element,context}=usageSetup();for(const id of ['setup','license','workflow','operations']){vm.runInContext("selectUsageCategory('"+id+"')",context);assert.match(element('agentUsageScenariosGrid').innerHTML,new RegExp('data-scenario-id="'+id+'"'));}
 });
 
@@ -428,4 +428,46 @@ test('quick start restores reference 01, 02 and 03 badges in both languages with
  }
  assert.match(html,/\.agent-usage-how-step-top\{display:flex;align-items:center;gap:8px/);
  assert.match(html,/\.agent-usage-step-num\{[^}]*min-width:22px;height:20px;[^}]*font-variant-numeric:tabular-nums/);
+});
+
+
+function localeSetup(saved,{readFails=false,writeFails=false}={}){
+ const writes=[],context=vm.createContext({window:{renderAgentLanguage(){writes.push('render');}},localStorage:{getItem(){if(readFails)throw Error('blocked');return saved;},setItem(key,value){if(writeFails)throw Error('blocked');writes.push([key,value]);}}});
+ vm.runInContext(readFileSync(path.join(dir,'translations.js'),'utf8'),context);vm.runInContext(readFileSync(path.join(dir,'i18n.js'),'utf8'),context);return{locale:context.window.AgentI18n,context,writes};
+}
+
+test('first visit defaults to English, including invalid or inaccessible saved preferences',()=>{
+ for(const saved of [null,'','invalid']){const {locale}=localeSetup(saved);assert.equal(locale.language,'en');assert.equal(locale.t('promptTitle'),'Generate Agent Setup Prompt');}
+ assert.equal(localeSetup(null,{readFails:true}).locale.language,'en');
+ assert.match(html,/<html lang="en">/);assert.match(html,/<title>HyperBDR - Agent Integration<\/title>/);
+});
+
+test('saved language preferences and manual switching continue to work with an English default',()=>{
+ for(const saved of ['zh','en'])assert.equal(localeSetup(saved).locale.language,saved);
+ const {locale,writes,context}=localeSetup(null);locale.toggle();assert.equal(locale.language,'zh');assert.equal(locale.t('promptTitle'),'生成智能体安装提示词');locale.toggle();assert.equal(locale.language,'en');
+ assert.deepEqual(writes.filter(v=>Array.isArray(v)),[['hyperbdr-agent-language','zh'],['hyperbdr-agent-language','en']]);
+ locale.set('invalid');assert.equal(locale.language,'en');assert.equal(writes.filter(v=>v==='render').length,2);
+ context.window.AGENT_MESSAGES.en.testFallback='English fallback';locale.set('zh');assert.equal(locale.t('testFallback'),'English fallback');
+ const blocked=localeSetup(null,{writeFails:true});blocked.locale.set('zh');assert.equal(blocked.locale.language,'zh');
+});
+
+test('thumbnail is standalone, entirely English and shows the current ready-to-use default state',()=>{
+ const svg=readFileSync(path.join(dir,'thumbnail.svg'),'utf8');
+ assert.doesNotMatch(svg,/[\u3400-\u9fff]/);
+ for(const label of ['Agent Integration','Token Management','Audit Logs','Generate Agent Setup Prompt','production-cli','Installation Prompt','How to use your agent','Install &amp; Connect'])assert.ok(svg.includes(label),label);
+ assert.match(svg,/>01<\/text>/);assert.match(svg,/>02<\/text>/);assert.match(svg,/>03<\/text>/);
+ assert.match(svg,/first enabled token is selected/);assert.match(svg,/data:image\/png;base64,/);assert.doesNotMatch(svg,/(?:href|src)="(?:https?:|\/)/);
+ assert.doesNotMatch(svg,/Please Select|disabled state/);
+});
+
+
+test('usage section titles are semantic h3 headings with 14px bold type and 22px line height',()=>{
+ for(const id of ['agentUsageHowTitle','agentUsageScenariosTitle'])assert.match(html,new RegExp('<h3 id="'+id+'" class="agent-usage-section-label">[^<]+</h3>'));
+ assert.match(html,/\.agent-usage-section-label\{margin:0;font:700 14px\/22px var\(--font\);color:var\(--agent-title\)\}/);
+});
+
+
+test('usage headings use the requested 16px H2 and 14px H3 hierarchy',()=>{
+ assert.match(html,/\.agent-usage h2\{margin:0 0 8px;font:700 16px\/24px var\(--font\)/);
+ assert.match(html,/\.agent-usage-section-label\{margin:0;font:700 14px\/22px var\(--font\)/);
 });

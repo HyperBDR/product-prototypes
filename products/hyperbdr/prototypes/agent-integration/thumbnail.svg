@@ -1,72 +1,52 @@
 <svg xmlns="http://www.w3.org/2000/svg" width="640" height="360" viewBox="0 0 640 360" role="img" aria-labelledby="thumbnail-title thumbnail-description">
-  <title id="thumbnail-title">HyperBDR 智能体集成</title>
-  <desc id="thumbnail-description">生成智能体安装提示词。左侧包含智能体集成、令牌管理和审计日志。令牌选择默认为空，显示请选择，生成按钮为禁用状态。</desc>
+  <title id="thumbnail-title">HyperBDR Agent Integration</title>
+  <desc id="thumbnail-description">English Agent Integration page. The first enabled token is selected and its installation prompt is ready. The usage guide includes steps 01, 02 and 03, four scenario tabs, and the Install and Connect card.</desc>
   <defs>
-    <filter id="card-shadow" x="-10%" y="-15%" width="120%" height="140%">
-      <feDropShadow dx="0" dy="2" stdDeviation="3" flood-color="#000" flood-opacity=".08"/>
-    </filter>
+    <filter id="card-shadow" x="-10%" y="-15%" width="120%" height="140%"><feDropShadow dx="0" dy="2" stdDeviation="3" flood-color="#000" flood-opacity=".08"/></filter>
     <style>
-      text{font-family:-apple-system,BlinkMacSystemFont,'Segoe UI',Roboto,'Helvetica Neue',Helvetica,Arial,'PingFang SC','Microsoft YaHei',sans-serif;fill:#595959}
-      .nav,.nav text{font-size:9px;fill:#fff;text-anchor:middle}
-      .side{font-size:11px}
-      .label{font-size:11px;font-weight:700;fill:#262626}
-      .muted{font-size:10px;fill:#bfbfbf}
+      text{font-family:-apple-system,BlinkMacSystemFont,'Segoe UI',Roboto,'Helvetica Neue',Helvetica,Arial,sans-serif;fill:#595959}
+      .nav{font-size:7px;fill:#fff;text-anchor:middle}.side{font-size:9px}.title{font-size:11px;font-weight:700;fill:#262626}.label{font-size:8px;fill:#595959}.help{font-size:7px;fill:#8c8c8c}.button{font-size:8px;fill:#262626;text-anchor:middle}.step{font-size:7.5px;font-weight:700;fill:#262626}.number{font-size:7px;font-weight:600;fill:#2f598a;text-anchor:middle}
     </style>
   </defs>
   <rect width="640" height="360" fill="#f5f5f5"/>
-  <!-- Navbar, using the existing local brand asset embedded for a standalone SVG. -->
-  <rect width="640" height="36" fill="#262626"/>
-  <image x="8" y="0" width="118" height="36" href="data:image/png;base64,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"/>
-  <path d="M130 13h12m-12 5h12m-12 5h12" fill="none" stroke="#fff" stroke-width="1.4"/>
-  <g class="nav">
-    <text x="163" y="22">概览</text>
-    <text x="200" y="22">资源容灾</text>
-    <text x="244" y="22">资源编排</text>
-    <text x="288" y="22">配置管理</text>
-    <text x="332" y="22">运维管理</text>
-    <text x="391" y="22">监控与告警管理</text>
-    <text x="445" y="22">设置</text>
-  </g>
-  <rect x="462" width="74" height="36" fill="#457ab0"/>
-  <text class="nav" x="499" y="22" style="font-size:10px">智能体集成</text>
-  <rect x="548" y="10" width="22" height="16" rx="8" fill="#493d2c"/>
-  <circle cx="560" cy="18" r="6" fill="#f09024"/>
-  <text x="560" y="21" text-anchor="middle" style="font-size:8px;fill:#fff">0</text>
-  <rect x="577" y="10" width="23" height="16" rx="8" fill="#d73434"/>
-  <text x="588.5" y="21" text-anchor="middle" style="font-size:8px;fill:#fff">99+</text>
-  <text x="608" y="22" style="font-size:10px;fill:#fff">admin</text>
-  <!-- Sidebar follows newmuse's neutral background and blue active item. -->
-  <path d="M95.5 36v324" stroke="#d9d9d9"/>
-  <g transform="translate(11 49)" fill="none" stroke="#457ab0" stroke-width="1.2">
-    <rect x="0" y="1" width="12" height="9" rx="2"/>
-    <path d="M6 1v-3M3 11l-1 3m7-3 1 3"/>
-    <circle cx="3.5" cy="5" r=".7" fill="#457ab0"/>
-    <circle cx="8.5" cy="5" r=".7" fill="#457ab0"/>
-  </g>
-  <text x="28" y="59" style="font-size:11px">智能体集成</text>
-  <rect x="6" y="72" width="84" height="28" rx="2" fill="#457ab0"/>
-  <text class="side" x="20" y="90" style="fill:#fff">智能体集成</text>
-  <text class="side" x="20" y="120">令牌管理</text>
-  <text class="side" x="20" y="148">审计日志</text>
-  <rect x="95.5" y="192" width="10" height="28" fill="#fff" stroke="#d9d9d9"/>
-  <path d="m102 202-3 4 3 4" fill="none" stroke="#457ab0"/>
-  <!-- Integration form: no default token, searchable selector and empty prompt. -->
-  <text x="108" y="59" style="font-size:13px;fill:#262626">智能体集成</text>
-  <rect x="108" y="78" width="520" height="264" rx="4" fill="#fff" filter="url(#card-shadow)"/>
-  <text x="120" y="101" style="font-size:14px;font-weight:700;fill:#262626">生成智能体安装提示词</text>
-  <text x="120" y="118" style="font-size:9px;fill:#8c8c8c">选择或生成令牌后生成专属安装提示词</text>
-  <text class="label" x="120" y="140">令牌编号</text>
-  <rect x="120.5" y="148.5" width="265" height="27" rx="2" fill="#fff" stroke="#d0d0d0"/>
-  <text class="muted" x="130" y="166">请选择</text>
-  <path d="m370 160 4 4 4-4" fill="none" stroke="#bfbfbf" stroke-width="1.1"/>
-  <rect x="394.5" y="148.5" width="105" height="27" rx="2" fill="#fff" stroke="#d9d9d9"/>
-  <path d="M405 157v10m-5-5h10" fill="none" stroke="#595959"/>
-  <text x="415" y="166" style="font-size:10px;fill:#262626">创建访问令牌</text>
-  <rect x="508.5" y="148.5" width="107" height="27" rx="2" fill="#f5f5f5" stroke="#d9d9d9"/>
-  <text x="562" y="166" text-anchor="middle" class="muted">生成提示词</text>
-  <text class="label" x="120" y="198">安装提示词</text>
-  <rect x="120.5" y="206.5" width="495" height="89" rx="2" fill="#fff" stroke="#d0d0d0"/>
-  <text x="130" y="226" style="font-size:10px;fill:#a6a6a6">请先选择一个已启用的令牌编号</text>
-  <rect x="120" y="306" width="496" height="20" rx="2" fill="#fffaf0"/>
-  <text x="130" y="319" style="font-size:9px;fill:#8c8c8c">提示词包含访问令牌，请仅在可信的智能体会话中使用。</text>
+  <rect width="640" height="32" fill="#262626"/>
+  <image x="6" y="0" width="104" height="32" href="data:image/png;base64,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"/>
+  <path d="M117 12h9m-9 4h9m-9 4h9" stroke="#fff"/>
+  <text class="nav" x="154" y="20">Dashboard</text><text class="nav" x="193" y="20">DR</text><text class="nav" x="239" y="20">Orchestration</text><text class="nav" x="301" y="20">Configuration</text><text class="nav" x="361" y="20">Operations</text><text class="nav" x="411" y="20">Settings</text>
+  <rect x="436" width="94" height="32" fill="#457ab0"/><text class="nav" x="483" y="20">Agent Integration</text>
+  <text class="nav" x="571" y="20">admin</text><text class="nav" x="616" y="20">EN / ZH</text>
+  <path d="M99.5 32v328" stroke="#d9d9d9"/>
+  <text class="side" x="10" y="51">Agent Integration</text>
+  <rect x="5" y="60" width="89" height="25" rx="2" fill="#457ab0"/><text class="side" x="12" y="76" style="fill:#fff">Agent Integration</text>
+  <text class="side" x="12" y="103">Token Management</text><text class="side" x="12" y="130">Audit Logs</text>
+  <text x="110" y="49" style="font-size:11px;fill:#262626">Agent Integration</text>
+  <rect x="110" y="58" width="518" height="148" rx="4" fill="#fff" filter="url(#card-shadow)"/>
+  <text class="title" x="122" y="76">Generate Agent Setup Prompt</text>
+  <text class="help" x="122" y="88">Select or create a token to generate an installation prompt</text>
+  <text class="label" x="122" y="103">Token ID</text>
+  <rect x="122.5" y="109.5" width="235" height="20" rx="2" fill="#fff" stroke="#d0d0d0"/>
+  <text x="130" y="123" style="font-size:8px">production-cli · sl_agent_xrJl...</text><path d="m343 118 3 3 3-3" fill="none" stroke="#bfbfbf"/>
+  <rect x="365.5" y="109.5" width="115" height="20" rx="2" fill="#fff" stroke="#d9d9d9"/><text class="button" x="423" y="123">+ Create Access Token</text>
+  <rect x="488" y="109" width="128" height="21" rx="2" fill="#457ab0"/><text class="button" x="552" y="123" style="fill:#fff">Generate Prompt</text>
+  <text class="label" x="122" y="142">Installation Prompt</text>
+  <rect x="122.5" y="148.5" width="493" height="36" rx="2" fill="#fff" stroke="#d9d9d9"/>
+  <text x="130" y="160" style="font-size:7.5px;fill:#262626">Install and configure the HyperBDR agent integration on this machine:</text>
+  <text x="130" y="174" style="font-size:7px;fill:#262626">npx hyperbdr-agent-kit install --url https://hyperbdr.com --api-key ...</text>
+  <rect x="576.5" y="164.5" width="31" height="15" rx="2" fill="#fff" stroke="#d9d9d9"/><text class="button" x="592" y="175">Copy</text>
+  <rect x="122.5" y="190.5" width="493" height="10" rx="2" fill="#fffaf0" stroke="#f09024" stroke-width=".5"/><text class="help" x="128" y="198">Use the complete access token only in a trusted agent session.</text>
+  <rect x="110" y="214" width="518" height="140" rx="4" fill="#fff" filter="url(#card-shadow)"/>
+  <text class="title" x="122" y="230">How to use your agent</text>
+  <rect x="122.5" y="238.5" width="493" height="30" rx="2" fill="#fafafa" stroke="#e3e3e3"/>
+  <path d="M287 239v29m164-29v29" stroke="#e3e3e3"/>
+  <g><rect x="129" y="245" width="15" height="13" rx="2" fill="#e6f0fa"/><text class="number" x="136.5" y="254">01</text><text class="step" x="149" y="254">Send the setup prompt</text></g>
+  <g><rect x="294" y="245" width="15" height="13" rx="2" fill="#e6f0fa"/><text class="number" x="301.5" y="254">02</text><text class="step" x="314" y="254">Describe your goal</text></g>
+  <g><rect x="458" y="245" width="15" height="13" rx="2" fill="#e6f0fa"/><text class="number" x="465.5" y="254">03</text><text class="step" x="478" y="254">Review, then confirm</text></g>
+  <text class="step" x="122" y="281">Try asking your agent</text>
+  <path d="M122 298.5h494" stroke="#e3e3e3"/>
+  <text x="130" y="294" style="font-size:8px;fill:#457ab0">Install &amp; Connect</text><text class="label" x="242" y="294">Licensing</text><text class="label" x="327" y="294">DR Guidance</text><text class="label" x="425" y="294">Operations</text>
+  <path d="M122 298h99" stroke="#457ab0" stroke-width="2"/>
+  <rect x="122.5" y="305.5" width="493" height="27" rx="2" fill="#fff" stroke="#e3e3e3"/>
+  <text class="step" x="130" y="316">Install &amp; Connect</text><text class="label" x="130" y="327">How do I install the agent?</text><text class="button" x="594" y="325">Copy</text>
+  <text class="help" x="122" y="342">Review the plan and impact before confirming changes.</text>
+  <text class="help" x="122" y="351">Connection: the agent runtime must reach hyperbdr.com over HTTPS.</text>
 </svg>
